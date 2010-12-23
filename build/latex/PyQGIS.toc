@@ -1,0 +1,60 @@
+\select@language {english}
+\contentsline {chapter}{\numberline {1}Introduction}{3}{chapter.1}
+\contentsline {section}{\numberline {1.1}Python Console}{3}{section.1.1}
+\contentsline {section}{\numberline {1.2}Python Plugins}{4}{section.1.2}
+\contentsline {section}{\numberline {1.3}Python Applications}{4}{section.1.3}
+\contentsline {subsection}{\numberline {1.3.1}Using PyQGIS in custom application}{5}{subsection.1.3.1}
+\contentsline {subsection}{\numberline {1.3.2}Running Custom Applications}{5}{subsection.1.3.2}
+\contentsline {chapter}{\numberline {2}Loading Layers}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Vector Layers}{7}{section.2.1}
+\contentsline {section}{\numberline {2.2}Raster Layers}{8}{section.2.2}
+\contentsline {section}{\numberline {2.3}Map Layer Registry}{8}{section.2.3}
+\contentsline {chapter}{\numberline {3}Using Raster Layers}{11}{chapter.3}
+\contentsline {section}{\numberline {3.1}Layer Details}{11}{section.3.1}
+\contentsline {section}{\numberline {3.2}Drawing Style}{11}{section.3.2}
+\contentsline {section}{\numberline {3.3}Single Band Rasters}{12}{section.3.3}
+\contentsline {section}{\numberline {3.4}Multi Band Rasters}{13}{section.3.4}
+\contentsline {section}{\numberline {3.5}Refresing Layers}{13}{section.3.5}
+\contentsline {section}{\numberline {3.6}Query Values}{13}{section.3.6}
+\contentsline {chapter}{\numberline {4}Using Vector Layers}{15}{chapter.4}
+\contentsline {section}{\numberline {4.1}Iterating over Vector Layer}{15}{section.4.1}
+\contentsline {section}{\numberline {4.2}Using Spatial Index}{16}{section.4.2}
+\contentsline {section}{\numberline {4.3}Writing Shapefiles}{17}{section.4.3}
+\contentsline {section}{\numberline {4.4}Memory Provider}{17}{section.4.4}
+\contentsline {section}{\numberline {4.5}Controlling Symbology of Vector Layers}{18}{section.4.5}
+\contentsline {chapter}{\numberline {5}Geometry Handling}{21}{chapter.5}
+\contentsline {chapter}{\numberline {6}Projections Support}{23}{chapter.6}
+\contentsline {section}{\numberline {6.1}Coordinate reference systems}{23}{section.6.1}
+\contentsline {section}{\numberline {6.2}Projections}{24}{section.6.2}
+\contentsline {chapter}{\numberline {7}Using Map Canvas}{25}{chapter.7}
+\contentsline {section}{\numberline {7.1}Embedding Map Canvas}{25}{section.7.1}
+\contentsline {section}{\numberline {7.2}Using Map Tools with Canvas}{26}{section.7.2}
+\contentsline {section}{\numberline {7.3}Rubber Bands and Vertex Markers}{27}{section.7.3}
+\contentsline {section}{\numberline {7.4}Writing Custom Map Tools}{28}{section.7.4}
+\contentsline {section}{\numberline {7.5}Writing Custom Map Canvas Items}{28}{section.7.5}
+\contentsline {chapter}{\numberline {8}Map Rendering and Printing}{29}{chapter.8}
+\contentsline {section}{\numberline {8.1}Simple Rendering}{29}{section.8.1}
+\contentsline {section}{\numberline {8.2}Output using Map Composer}{30}{section.8.2}
+\contentsline {chapter}{\numberline {9}Expressions, Filtering and Calculating Values}{31}{chapter.9}
+\contentsline {section}{\numberline {9.1}Parsing Expressions}{32}{section.9.1}
+\contentsline {section}{\numberline {9.2}Evaluating Expressions}{32}{section.9.2}
+\contentsline {chapter}{\numberline {10}Measuring}{33}{chapter.10}
+\contentsline {chapter}{\numberline {11}Using Plugin Layers}{35}{chapter.11}
+\contentsline {section}{\numberline {11.1}Subclassing QgsPluginLayer}{35}{section.11.1}
+\contentsline {chapter}{\numberline {12}Developing Python Plugins}{37}{chapter.12}
+\contentsline {section}{\numberline {12.1}Writing a plugin}{37}{section.12.1}
+\contentsline {section}{\numberline {12.2}Creating necessary files}{37}{section.12.2}
+\contentsline {section}{\numberline {12.3}Writing code}{38}{section.12.3}
+\contentsline {subsection}{\numberline {12.3.1}\_\_init\_\_.py}{38}{subsection.12.3.1}
+\contentsline {subsection}{\numberline {12.3.2}plugin.py}{39}{subsection.12.3.2}
+\contentsline {subsection}{\numberline {12.3.3}Resource File}{39}{subsection.12.3.3}
+\contentsline {section}{\numberline {12.4}Documentation}{40}{section.12.4}
+\contentsline {section}{\numberline {12.5}Code Snippets}{40}{section.12.5}
+\contentsline {subsection}{\numberline {12.5.1}How to call a method by a key shortcut}{40}{subsection.12.5.1}
+\contentsline {subsection}{\numberline {12.5.2}How to toggle Layers (work around)}{41}{subsection.12.5.2}
+\contentsline {subsection}{\numberline {12.5.3}How to access attribute table of selected features}{41}{subsection.12.5.3}
+\contentsline {subsection}{\numberline {12.5.4}How to debug a plugin using PDB}{41}{subsection.12.5.4}
+\contentsline {section}{\numberline {12.6}Testing}{42}{section.12.6}
+\contentsline {section}{\numberline {12.7}Releasing the plugin}{42}{section.12.7}
+\contentsline {section}{\numberline {12.8}Remark: Configuring Your IDE on Windows}{42}{section.12.8}
+\contentsline {chapter}{\numberline {13}Indices and tables}{45}{chapter.13}

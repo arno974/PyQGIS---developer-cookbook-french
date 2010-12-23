@@ -1,0 +1,204 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Map Rendering and Printing &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Expressions, Filtering and Calculating Values" href="expressions.html" />
+    <link rel="prev" title="Using Map Canvas" href="canvas.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="expressions.html" title="Expressions, Filtering and Calculating Values"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="canvas.html" title="Using Map Canvas"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="map-rendering-and-printing">
+<span id="composer"></span><h1>Map Rendering and Printing<a class="headerlink" href="#map-rendering-and-printing" title="Permalink to this headline">¶</a></h1>
+<p>There are generally two approaches when input data should be rendered as a map: either do it quick way using <tt class="xref docutils literal"><span class="pre">QgsMapRenderer</span></tt> or
+produce more fine-tuned output by composing the map with <tt class="xref docutils literal"><span class="pre">QgsComposition</span></tt> class and friends.</p>
+<div class="section" id="simple-rendering">
+<h2>Simple Rendering<a class="headerlink" href="#simple-rendering" title="Permalink to this headline">¶</a></h2>
+<p>Render some layers using <tt class="xref docutils literal"><span class="pre">QgsMapRenderer</span></tt> - create destination paint device (<tt class="docutils literal"><span class="pre">QImage</span></tt>, <tt class="docutils literal"><span class="pre">QPainter</span></tt> etc.), set up layer set, extent, output size and do the rendering:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create image</span>
+<span class="n">img</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="mi">800</span><span class="p">,</span><span class="mi">600</span><span class="p">),</span> <span class="n">QImage</span><span class="o">.</span><span class="n">Format_ARGB32_Premultiplied</span><span class="p">)</span>
+
+<span class="c"># set image&#39;s background color</span>
+<span class="n">color</span> <span class="o">=</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span>
+<span class="n">img</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">color</span><span class="o">.</span><span class="n">rgb</span><span class="p">())</span>
+
+<span class="c"># create painter</span>
+<span class="n">p</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">()</span>
+<span class="n">p</span><span class="o">.</span><span class="n">begin</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<span class="n">p</span><span class="o">.</span><span class="n">setRenderHint</span><span class="p">(</span><span class="n">QPainter</span><span class="o">.</span><span class="n">Antialiasing</span><span class="p">)</span>
+
+<span class="n">render</span> <span class="o">=</span> <span class="n">QgsMapRender</span><span class="p">()</span>
+
+<span class="c"># set layer set</span>
+<span class="n">lst</span> <span class="o">=</span> <span class="p">[</span> <span class="n">layer</span><span class="o">.</span><span class="n">getLayerID</span><span class="p">()</span> <span class="p">]</span>  <span class="c"># add ID of every layer</span>
+<span class="n">render</span><span class="o">.</span><span class="n">setLayerSet</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+
+<span class="c"># set extent</span>
+<span class="n">rect</span> <span class="o">=</span> <span class="n">QgsRect</span><span class="p">(</span><span class="n">render</span><span class="o">.</span><span class="n">fullExtent</span><span class="p">())</span>
+<span class="n">rect</span><span class="o">.</span><span class="n">scale</span><span class="p">(</span><span class="mf">1.1</span><span class="p">)</span>
+<span class="n">render</span><span class="o">.</span><span class="n">setExtent</span><span class="p">(</span><span class="n">rect</span><span class="p">)</span>
+
+<span class="c"># set output size</span>
+<span class="n">render</span><span class="o">.</span><span class="n">setOutputSize</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">size</span><span class="p">(),</span> <span class="n">img</span><span class="o">.</span><span class="n">logicalDpiX</span><span class="p">())</span>
+
+<span class="c"># do the rendering</span>
+<span class="n">render</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
+<span class="n">p</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+<span class="c"># save image</span>
+<span class="n">img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&quot;render.png&quot;</span><span class="p">,</span><span class="s">&quot;png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="output-using-map-composer">
+<h2>Output using Map Composer<a class="headerlink" href="#output-using-map-composer" title="Permalink to this headline">¶</a></h2>
+<p>The following piece of code renders layers from map canvas with the current extent into a PNG file. The default settings
+for composition are page size A4 and resolution 300 DPI (it&#8217;s possible to change them).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">qgis.utils</span> <span class="kn">import</span> <span class="n">iface</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># set up composition</span>
+<span class="n">mapRenderer</span> <span class="o">=</span> <span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">mapRenderer</span><span class="p">()</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">QgsComposition</span><span class="p">(</span><span class="n">mapRenderer</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">setPlotStyle</span><span class="p">(</span><span class="n">QgsComposition</span><span class="o">.</span><span class="n">Print</span><span class="p">)</span>
+
+<span class="n">dpi</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">printResolution</span><span class="p">()</span>
+<span class="n">dpmm</span> <span class="o">=</span> <span class="n">dpi</span> <span class="o">/</span> <span class="mf">25.4</span>
+<span class="n">width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dpmm</span> <span class="o">*</span> <span class="n">c</span><span class="o">.</span><span class="n">paperWidth</span><span class="p">())</span>
+<span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dpmm</span> <span class="o">*</span> <span class="n">c</span><span class="o">.</span><span class="n">paperHeight</span><span class="p">())</span>
+
+<span class="c"># add a map to the composition</span>
+<span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span>
+<span class="n">w</span><span class="p">,</span> <span class="n">h</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">paperWidth</span><span class="p">(),</span> <span class="n">c</span><span class="o">.</span><span class="n">paperHeight</span><span class="p">()</span>
+<span class="n">composerMap</span> <span class="o">=</span> <span class="n">QgsComposerMap</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">w</span><span class="p">,</span><span class="n">h</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">composerMap</span><span class="p">)</span>
+
+<span class="c"># create output image and initialize it</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">QImage</span><span class="p">(</span><span class="n">QSize</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">),</span> <span class="n">QImage</span><span class="o">.</span><span class="n">Format_ARGB32</span><span class="p">)</span>
+<span class="n">image</span><span class="o">.</span><span class="n">setDotsPerMeterX</span><span class="p">(</span><span class="n">dpmm</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">image</span><span class="o">.</span><span class="n">setDotsPerMeterY</span><span class="p">(</span><span class="n">dpmm</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">)</span>
+<span class="n">image</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+<span class="c"># render the composition</span>
+<span class="n">imagePainter</span> <span class="o">=</span> <span class="n">QPainter</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">sourceArea</span> <span class="o">=</span> <span class="n">QRectF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">c</span><span class="o">.</span><span class="n">paperWidth</span><span class="p">(),</span> <span class="n">c</span><span class="o">.</span><span class="n">paperHeight</span><span class="p">())</span>
+<span class="n">targetArea</span> <span class="o">=</span> <span class="n">QRectF</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">width</span><span class="p">,</span> <span class="n">height</span><span class="p">)</span>
+<span class="n">c</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">imagePainter</span><span class="p">,</span> <span class="n">targetArea</span><span class="p">,</span> <span class="n">sourceArea</span><span class="p">)</span>
+<span class="n">imagePainter</span><span class="o">.</span><span class="n">end</span><span class="p">()</span>
+
+<span class="n">image</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s">&quot;out.png&quot;</span><span class="p">,</span> <span class="s">&quot;png&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="docutils">
+<dt><strong>TODO:</strong></dt>
+<dd>Output to PDF,
+Loading/saving compositions,
+More composer items (north arrow, scale, ...)</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Map Rendering and Printing</a><ul>
+<li><a class="reference external" href="#simple-rendering">Simple Rendering</a></li>
+<li><a class="reference external" href="#output-using-map-composer">Output using Map Composer</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="canvas.html"
+                                  title="previous chapter">Using Map Canvas</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="expressions.html"
+                                  title="next chapter">Expressions, Filtering and Calculating Values</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/composer.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="expressions.html" title="Expressions, Filtering and Calculating Values"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="canvas.html" title="Using Map Canvas"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

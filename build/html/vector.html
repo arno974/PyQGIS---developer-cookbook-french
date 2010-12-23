@@ -1,0 +1,392 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Vector Layers &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Geometry Handling" href="geometry.html" />
+    <link rel="prev" title="Using Raster Layers" href="raster.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="geometry.html" title="Geometry Handling"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="raster.html" title="Using Raster Layers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-vector-layers">
+<span id="vector"></span><h1>Using Vector Layers<a class="headerlink" href="#using-vector-layers" title="Permalink to this headline">¶</a></h1>
+<p>This section summarizes various actions that can be done with vector layers.</p>
+<dl class="docutils">
+<dt><strong>TODO:</strong></dt>
+<dd>Editing, Layer vs. Data provider, ...</dd>
+</dl>
+<div class="section" id="iterating-over-vector-layer">
+<h2>Iterating over Vector Layer<a class="headerlink" href="#iterating-over-vector-layer" title="Permalink to this headline">¶</a></h2>
+<p>Below is an example how to go through the features of the layer. To read features from layer, initialize the retieval with <tt class="xref docutils literal"><span class="pre">select()</span></tt> and then use <tt class="xref docutils literal"><span class="pre">nextFeature()</span></tt> calls:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">provider</span> <span class="o">=</span> <span class="n">vlayer</span><span class="o">.</span><span class="n">dataProvider</span><span class="p">()</span>
+
+<span class="n">feat</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">()</span>
+<span class="n">allAttrs</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">attributeIndexes</span><span class="p">()</span>
+
+<span class="c"># start data retreival: fetch geometry and all attributes for each feature</span>
+<span class="n">provider</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">allAttrs</span><span class="p">)</span>
+
+<span class="c"># retreive every feature with its geometry and attributes</span>
+<span class="k">while</span> <span class="n">provider</span><span class="o">.</span><span class="n">nextFeature</span><span class="p">(</span><span class="n">feat</span><span class="p">):</span>
+
+  <span class="c"># fetch geometry</span>
+  <span class="n">geom</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span>
+  <span class="k">print</span> <span class="s">&quot;Feature ID </span><span class="si">%d</span><span class="s">: &quot;</span> <span class="o">%</span> <span class="n">feat</span><span class="o">.</span><span class="n">id</span><span class="p">()</span> <span class="p">,</span>
+
+  <span class="c"># show some information about the feature</span>
+  <span class="k">if</span> <span class="n">geom</span><span class="o">.</span><span class="n">vectorType</span><span class="p">()</span> <span class="o">==</span> <span class="n">QGis</span><span class="o">.</span><span class="n">Point</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">asPoint</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&quot;Point: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">geom</span><span class="o">.</span><span class="n">vectorType</span><span class="p">()</span> <span class="o">==</span> <span class="n">QGis</span><span class="o">.</span><span class="n">Line</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">asPolyline</span><span class="p">()</span>
+    <span class="k">print</span> <span class="s">&quot;Line: </span><span class="si">%d</span><span class="s"> points&quot;</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+  <span class="k">elif</span> <span class="n">geom</span><span class="o">.</span><span class="n">vectorType</span><span class="p">()</span> <span class="o">==</span> <span class="n">QGis</span><span class="o">.</span><span class="n">Polygon</span><span class="p">:</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">asPolygon</span><span class="p">()</span>
+    <span class="n">numPts</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">ring</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+      <span class="n">numPts</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ring</span><span class="p">)</span>
+    <span class="k">print</span> <span class="s">&quot;Polygon: </span><span class="si">%d</span><span class="s"> rings with </span><span class="si">%d</span><span class="s"> points&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">numPts</span><span class="p">)</span>
+  <span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Unknown&quot;</span>
+
+  <span class="c"># fetch map of attributes</span>
+  <span class="n">attrs</span> <span class="o">=</span> <span class="n">feat</span><span class="o">.</span><span class="n">attributeMap</span><span class="p">()</span>
+
+  <span class="c"># attrs is a dictionary: key = field index, value = QgsFeatureAttribute</span>
+  <span class="c"># show all attributes and their values</span>
+  <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">attr</span><span class="p">)</span> <span class="ow">in</span> <span class="n">attrs</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+    <span class="k">print</span> <span class="s">&quot;</span><span class="si">%d</span><span class="s">: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">attr</span><span class="o">.</span><span class="n">toString</span><span class="p">())</span>
+</pre></div>
+</div>
+<p><tt class="xref docutils literal"><span class="pre">select()</span></tt> gives you flexibility in what data will be fetched. It can get 4 arguments, all of them are optional:</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>fetchAttributes</dt>
+<dd><p class="first last">List of attributes which should be fetched. Default: empty list</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>rect</dt>
+<dd><p class="first last">Spatial filter. If empty rect is given (<tt class="xref docutils literal"><span class="pre">QgsRect()</span></tt>), all features are fetched. Default: empty rect</p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>fetchGeometry</dt>
+<dd><p class="first last">Whether geometry of the feature should be fetched. Default: <tt class="xref xref docutils literal"><span class="pre">True</span></tt></p>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>useIntersect</dt>
+<dd><p class="first last">When using spatial filter, this argument says whether accurate test for intersection should be done or whether test on bounding box suffices.
+This is needed e.g. for feature identification or selection. Default: <tt class="xref xref docutils literal"><span class="pre">False</span></tt></p>
+</dd>
+</dl>
+</li>
+</ol>
+<p>Some examples:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># fetch features with geometry and only first two fields</span>
+<span class="n">provider</span><span class="o">.</span><span class="n">select</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">])</span>
+
+<span class="c"># fetch features with geometry which are in specified rect, attributes won&#39;t be retreived</span>
+<span class="n">provider</span><span class="o">.</span><span class="n">select</span><span class="p">([],</span> <span class="n">QgsRectangle</span><span class="p">(</span><span class="mf">23.5</span><span class="p">,</span> <span class="o">-</span><span class="mi">10</span><span class="p">,</span> <span class="mf">24.2</span><span class="p">,</span> <span class="o">-</span><span class="mi">7</span><span class="p">))</span>
+
+<span class="c"># fetch features without geometry, with all attributes</span>
+<span class="n">allAtt</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">attributeIndexes</span><span class="p">()</span>
+<span class="n">provider</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">allAtt</span><span class="p">,</span> <span class="n">QgsRectangle</span><span class="p">(),</span> <span class="bp">False</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To obtain field index from its name, use provider&#8217;s <tt class="xref docutils literal"><span class="pre">fieldNameIndex()</span></tt> function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">fldDesc</span> <span class="o">=</span> <span class="n">provider</span><span class="o">.</span><span class="n">fieldNameIndex</span><span class="p">(</span><span class="s">&quot;DESCRIPTION&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">fldDesc</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;Field not found!&quot;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-spatial-index">
+<h2>Using Spatial Index<a class="headerlink" href="#using-spatial-index" title="Permalink to this headline">¶</a></h2>
+<dl class="docutils">
+<dt><strong>TODO:</strong></dt>
+<dd>Intro to spatial indexing</dd>
+</dl>
+<ol class="arabic">
+<li><p class="first">create spatial index - the following code creates an empty index:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">index</span> <span class="o">=</span> <span class="n">QgsSpatialIndex</span><span class="p">()</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">add features to index - index takes <tt class="xref docutils literal"><span class="pre">QgsFeature</span></tt> object and adds it to the internal data structure.
+You can create the object manually or use one from previous call to provider&#8217;s <tt class="xref docutils literal"><span class="pre">nextFeature()</span></tt></p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">index</span><span class="o">.</span><span class="n">insertFeature</span><span class="p">(</span><span class="n">feat</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">once spatial index is filled with some values, you can do some queries:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># returns array of feature IDs of five nearest features</span>
+<span class="n">nearest</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">nearestNeighbor</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mf">25.4</span><span class="p">,</span> <span class="mf">12.7</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+
+<span class="c"># returns array of IDs of features which intersect the rectangle</span>
+<span class="n">intersect</span> <span class="o">=</span> <span class="n">index</span><span class="o">.</span><span class="n">intersects</span><span class="p">(</span><span class="n">QgsRect</span><span class="p">(</span><span class="mf">22.5</span><span class="p">,</span> <span class="mf">15.3</span><span class="p">,</span> <span class="mf">23.1</span><span class="p">,</span> <span class="mf">17.2</span><span class="p">))</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="writing-shapefiles">
+<h2>Writing Shapefiles<a class="headerlink" href="#writing-shapefiles" title="Permalink to this headline">¶</a></h2>
+<p>You can write shapefiles using <tt class="xref docutils literal"><span class="pre">QgsVectorFileWriter</span></tt> class. Besides shapefiles, it supports any kind of vector file that OGR supports.</p>
+<p>There are two possibilities how to export a shapefile:</p>
+<ul>
+<li><p class="first">from an instance of <tt class="xref docutils literal"><span class="pre">QgsVectorLayer</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">error</span> <span class="o">=</span> <span class="n">QgsVectorFileWriter</span><span class="o">.</span><span class="n">writeAsShapefile</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s">&quot;my_shapes.shp&quot;</span><span class="p">,</span> <span class="s">&quot;CP1250&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">error</span> <span class="o">==</span> <span class="n">QgsVectorFileWriter</span><span class="o">.</span><span class="n">NoError</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;success!&quot;</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">directly from features:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># define fields for feature attributes</span>
+<span class="n">fields</span> <span class="o">=</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">QgsField</span><span class="p">(</span><span class="s">&quot;first&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">Int</span><span class="p">),</span>
+           <span class="mi">1</span> <span class="p">:</span> <span class="n">QgsField</span><span class="p">(</span><span class="s">&quot;second&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">String</span><span class="p">)</span> <span class="p">}</span>
+
+<span class="c"># create an instance of vector file writer, it will create the shapefile. Arguments:</span>
+<span class="c"># 1. path to new shapefile (will fail if exists already)</span>
+<span class="c"># 2. encoding of the attributes</span>
+<span class="c"># 3. field map</span>
+<span class="c"># 4. geometry type - from WKBTYPE enum</span>
+<span class="c"># 5. layer&#39;s spatial reference (instance of QgsCoordinateReferenceSystem) - optional</span>
+<span class="n">writer</span> <span class="o">=</span> <span class="n">QgsVectorFileWriter</span><span class="p">(</span><span class="s">&quot;my_shapes.shp&quot;</span><span class="p">,</span> <span class="s">&quot;CP1250&quot;</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">QGis</span><span class="o">.</span><span class="n">WKBPoint</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">writer</span><span class="o">.</span><span class="n">hasError</span><span class="p">()</span> <span class="o">!=</span> <span class="n">QgsVectorFileWriter</span><span class="o">.</span><span class="n">NoError</span><span class="p">:</span>
+  <span class="k">print</span> <span class="s">&quot;Error when creating shapefile: &quot;</span><span class="p">,</span> <span class="n">writer</span><span class="o">.</span><span class="n">hasError</span><span class="p">()</span>
+
+<span class="c"># add some features</span>
+<span class="n">fet</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">()</span>
+<span class="n">fet</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">)))</span>
+<span class="n">fet</span><span class="o">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">QVariant</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">fet</span><span class="o">.</span><span class="n">addAttribute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">QVariant</span><span class="p">(</span><span class="s">&quot;text&quot;</span><span class="p">))</span>
+<span class="n">writer</span><span class="o">.</span><span class="n">addFeature</span><span class="p">(</span><span class="n">fet</span><span class="p">)</span>
+
+<span class="c"># delete the writer to flush features to disk (optional)</span>
+<span class="k">del</span> <span class="n">writer</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+<div class="section" id="memory-provider">
+<h2>Memory Provider<a class="headerlink" href="#memory-provider" title="Permalink to this headline">¶</a></h2>
+<p>Memory provider is intended to be used mainly by plugin or 3rd party app developers.
+It does not store data on disk, allowing developers to use it as a fast backend for some temporary layers (until now one had to use e.g. OGR provider).
+You can use it by passing <tt class="docutils literal"><span class="pre">&quot;memory&quot;</span></tt> provider string to vector layer constructor.</p>
+<p>Following URIs are allowed: &#8220;Point&#8221; / &#8220;LineString&#8221; / &#8220;Polygon&#8221; / &#8220;MultiPoint&#8221; / &#8220;MultiLineString&#8221; / &#8220;MultiPolygon&#8221; - for different types of data stored in the layer.</p>
+<p>The provider supports string, int and double fields.</p>
+<p>Following example should be self-explaining:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># create layer</span>
+<span class="n">vl</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="s">&quot;Point&quot;</span><span class="p">,</span> <span class="s">&quot;temporary_points&quot;</span><span class="p">,</span> <span class="s">&quot;memory&quot;</span><span class="p">)</span>
+<span class="n">pr</span> <span class="o">=</span> <span class="n">vl</span><span class="o">.</span><span class="n">dataProvider</span><span class="p">()</span>
+
+<span class="c"># add fields</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">addAttributes</span><span class="p">(</span> <span class="p">[</span> <span class="n">QgsField</span><span class="p">(</span><span class="s">&quot;name&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">String</span><span class="p">),</span>
+                    <span class="n">QgsField</span><span class="p">(</span><span class="s">&quot;age&quot;</span><span class="p">,</span>  <span class="n">QVariant</span><span class="o">.</span><span class="n">Int</span><span class="p">),</span>
+                    <span class="n">QgsField</span><span class="p">(</span><span class="s">&quot;size&quot;</span><span class="p">,</span> <span class="n">QVariant</span><span class="o">.</span><span class="n">Double</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+
+<span class="c"># add a feature</span>
+<span class="n">fet</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">()</span>
+<span class="n">fet</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span> <span class="p">)</span>
+<span class="n">fet</span><span class="o">.</span><span class="n">setAttributeMap</span><span class="p">(</span> <span class="p">{</span> <span class="mi">0</span> <span class="p">:</span> <span class="n">QVariant</span><span class="p">(</span><span class="s">&quot;Johny&quot;</span><span class="p">),</span>
+                       <span class="mi">1</span> <span class="p">:</span> <span class="n">QVariant</span><span class="p">(</span><span class="mi">20</span><span class="p">),</span>
+                       <span class="mi">2</span> <span class="p">:</span> <span class="n">QVariant</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span> <span class="p">}</span> <span class="p">)</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">addFeatures</span><span class="p">(</span> <span class="p">[</span> <span class="n">fet</span> <span class="p">]</span> <span class="p">)</span>
+
+<span class="c"># update layer&#39;s extent when new features have been added</span>
+<span class="c"># because change of extent in provider is not propagated to the layer</span>
+<span class="n">vl</span><span class="o">.</span><span class="n">updateExtents</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Finally, let&#8217;s check whether everything went well:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># show some stats</span>
+<span class="k">print</span> <span class="s">&quot;fields:&quot;</span><span class="p">,</span> <span class="n">pr</span><span class="o">.</span><span class="n">fieldCount</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;features:&quot;</span><span class="p">,</span> <span class="n">pr</span><span class="o">.</span><span class="n">featureCount</span><span class="p">()</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">pr</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;extent:&quot;</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">xMin</span><span class="p">(),</span><span class="n">e</span><span class="o">.</span><span class="n">yMin</span><span class="p">(),</span><span class="n">e</span><span class="o">.</span><span class="n">xMax</span><span class="p">(),</span><span class="n">e</span><span class="o">.</span><span class="n">yMax</span><span class="p">()</span>
+
+<span class="c"># iterate over features</span>
+<span class="n">f</span> <span class="o">=</span> <span class="n">QgsFeature</span><span class="p">()</span>
+<span class="n">pr</span><span class="o">.</span><span class="n">select</span><span class="p">()</span>
+<span class="k">while</span> <span class="n">pr</span><span class="o">.</span><span class="n">nextFeature</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+  <span class="k">print</span> <span class="s">&quot;F:&quot;</span><span class="p">,</span><span class="n">f</span><span class="o">.</span><span class="n">id</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">attributeMap</span><span class="p">(),</span> <span class="n">f</span><span class="o">.</span><span class="n">geometry</span><span class="p">()</span><span class="o">.</span><span class="n">asPoint</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Memory provider also supports spatial indexing. This means you can call provider&#8217;s <tt class="xref docutils literal"><span class="pre">createSpatialIndex()</span></tt> function.
+Once the spatial index is created (using <tt class="xref docutils literal"><span class="pre">QgsSpatialIndex</span></tt> class), you will be able to iterate over features within smaller regions faster
+(since it&#8217;s not necessary to traverse all the features, only those in specified rectangle).</p>
+</div>
+<div class="section" id="controlling-symbology-of-vector-layers">
+<h2>Controlling Symbology of Vector Layers<a class="headerlink" href="#controlling-symbology-of-vector-layers" title="Permalink to this headline">¶</a></h2>
+<p>When a vector layer is being rendered, the appearance of the data is given by one or more symbols. A symbol
+determines color, size and other properties of the feature.
+Renderer associated with the layer decides what symbol will be used for particular feature. There are
+four available renderers:</p>
+<ul class="simple">
+<li>single symbol renderer (<tt class="xref docutils literal"><span class="pre">QgsSingleSymbolRenderer</span></tt>) &#8212; all features are rendererd with the same symbol.</li>
+<li>unique value renderer (<tt class="xref docutils literal"><span class="pre">QgsUniqueValueRenderer</span></tt>) &#8212; symbol for each feature is choosen from attribute value.</li>
+<li>graduated symbol renderer (<tt class="xref docutils literal"><span class="pre">QgsGraduatedSymbolRenderer</span></tt>)</li>
+<li>continuous color renderer (<tt class="xref docutils literal"><span class="pre">QgsContinuousSymbolRenderer</span></tt>)</li>
+</ul>
+<p>How to create a point symbol:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sym</span> <span class="o">=</span> <span class="n">QgsSymbol</span><span class="p">(</span><span class="n">QGis</span><span class="o">.</span><span class="n">Point</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">black</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setFillColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">green</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setFillStyle</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">SolidPattern</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setLineWidth</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setPointSize</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setNamedPointSymbol</span><span class="p">(</span><span class="s">&quot;hard:triangle&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="xref docutils literal"><span class="pre">setNamedPointSymbol()</span></tt> method determines the shape of the symbol. There are two classes:
+hardcoded symbols (prefixed <tt class="docutils literal"><span class="pre">hard:</span></tt>) and SVG symbols (prefixed <tt class="docutils literal"><span class="pre">svg:</span></tt>). The following hardcoded
+symbols are available: <tt class="docutils literal"><span class="pre">circle</span></tt>, <tt class="docutils literal"><span class="pre">rectangle</span></tt>, <tt class="docutils literal"><span class="pre">diamond</span></tt>, <tt class="docutils literal"><span class="pre">pentagon</span></tt>, <tt class="docutils literal"><span class="pre">cross</span></tt>, <tt class="docutils literal"><span class="pre">cross2</span></tt>, <tt class="docutils literal"><span class="pre">triangle</span></tt>,
+<tt class="docutils literal"><span class="pre">equilateral_triangle</span></tt>, <tt class="docutils literal"><span class="pre">star</span></tt>, <tt class="docutils literal"><span class="pre">regular_star</span></tt>, <tt class="docutils literal"><span class="pre">arrow</span></tt>.</p>
+<p>How to create an SVG symbol:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sym</span> <span class="o">=</span> <span class="n">QgsSymbol</span><span class="p">(</span><span class="n">QGis</span><span class="o">.</span><span class="n">Point</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setNamedPointSymbol</span><span class="p">(</span><span class="s">&quot;svg:Star1.svg&quot;</span><span class="p">)</span>
+<span class="n">sym</span><span class="o">.</span><span class="n">setPointSize</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>SVG symbols do not support setting colors, fill and line styles.</p>
+<p>How to create a line symbol:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TODO</span>
+</pre></div>
+</div>
+<p>How to create a fill symbol:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TODO</span>
+</pre></div>
+</div>
+<p>Create a single symbol renderer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">sr</span> <span class="o">=</span> <span class="n">QgsSingleSymbolRenderer</span><span class="p">(</span><span class="n">QGis</span><span class="o">.</span><span class="n">Point</span><span class="p">)</span>
+<span class="n">sr</span><span class="o">.</span><span class="n">addSymbol</span><span class="p">(</span><span class="n">sym</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Assign the renderer to a layer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">layer</span><span class="o">.</span><span class="n">setRenderer</span><span class="p">(</span><span class="n">sr</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Create unique value renderer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TODO</span>
+</pre></div>
+</div>
+<p>Create graduated symbol renderer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">TODO</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Using Vector Layers</a><ul>
+<li><a class="reference external" href="#iterating-over-vector-layer">Iterating over Vector Layer</a></li>
+<li><a class="reference external" href="#using-spatial-index">Using Spatial Index</a></li>
+<li><a class="reference external" href="#writing-shapefiles">Writing Shapefiles</a></li>
+<li><a class="reference external" href="#memory-provider">Memory Provider</a></li>
+<li><a class="reference external" href="#controlling-symbology-of-vector-layers">Controlling Symbology of Vector Layers</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="raster.html"
+                                  title="previous chapter">Using Raster Layers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="geometry.html"
+                                  title="next chapter">Geometry Handling</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/vector.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="geometry.html" title="Geometry Handling"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="raster.html" title="Using Raster Layers"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

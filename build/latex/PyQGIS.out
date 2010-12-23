@@ -1,0 +1,50 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}
+\BOOKMARK [1][-]{section.1.1}{Python Console}{chapter.1}
+\BOOKMARK [1][-]{section.1.2}{Python Plugins}{chapter.1}
+\BOOKMARK [1][-]{section.1.3}{Python Applications}{chapter.1}
+\BOOKMARK [0][-]{chapter.2}{Loading Layers}{}
+\BOOKMARK [1][-]{section.2.1}{Vector Layers}{chapter.2}
+\BOOKMARK [1][-]{section.2.2}{Raster Layers}{chapter.2}
+\BOOKMARK [1][-]{section.2.3}{Map Layer Registry}{chapter.2}
+\BOOKMARK [0][-]{chapter.3}{Using Raster Layers}{}
+\BOOKMARK [1][-]{section.3.1}{Layer Details}{chapter.3}
+\BOOKMARK [1][-]{section.3.2}{Drawing Style}{chapter.3}
+\BOOKMARK [1][-]{section.3.3}{Single Band Rasters}{chapter.3}
+\BOOKMARK [1][-]{section.3.4}{Multi Band Rasters}{chapter.3}
+\BOOKMARK [1][-]{section.3.5}{Refresing Layers}{chapter.3}
+\BOOKMARK [1][-]{section.3.6}{Query Values}{chapter.3}
+\BOOKMARK [0][-]{chapter.4}{Using Vector Layers}{}
+\BOOKMARK [1][-]{section.4.1}{Iterating over Vector Layer}{chapter.4}
+\BOOKMARK [1][-]{section.4.2}{Using Spatial Index}{chapter.4}
+\BOOKMARK [1][-]{section.4.3}{Writing Shapefiles}{chapter.4}
+\BOOKMARK [1][-]{section.4.4}{Memory Provider}{chapter.4}
+\BOOKMARK [1][-]{section.4.5}{Controlling Symbology of Vector Layers}{chapter.4}
+\BOOKMARK [0][-]{chapter.5}{Geometry Handling}{}
+\BOOKMARK [0][-]{chapter.6}{Projections Support}{}
+\BOOKMARK [1][-]{section.6.1}{Coordinate reference systems}{chapter.6}
+\BOOKMARK [1][-]{section.6.2}{Projections}{chapter.6}
+\BOOKMARK [0][-]{chapter.7}{Using Map Canvas}{}
+\BOOKMARK [1][-]{section.7.1}{Embedding Map Canvas}{chapter.7}
+\BOOKMARK [1][-]{section.7.2}{Using Map Tools with Canvas}{chapter.7}
+\BOOKMARK [1][-]{section.7.3}{Rubber Bands and Vertex Markers}{chapter.7}
+\BOOKMARK [1][-]{section.7.4}{Writing Custom Map Tools}{chapter.7}
+\BOOKMARK [1][-]{section.7.5}{Writing Custom Map Canvas Items}{chapter.7}
+\BOOKMARK [0][-]{chapter.8}{Map Rendering and Printing}{}
+\BOOKMARK [1][-]{section.8.1}{Simple Rendering}{chapter.8}
+\BOOKMARK [1][-]{section.8.2}{Output using Map Composer}{chapter.8}
+\BOOKMARK [0][-]{chapter.9}{Expressions, Filtering and Calculating Values}{}
+\BOOKMARK [1][-]{section.9.1}{Parsing Expressions}{chapter.9}
+\BOOKMARK [1][-]{section.9.2}{Evaluating Expressions}{chapter.9}
+\BOOKMARK [0][-]{chapter.10}{Measuring}{}
+\BOOKMARK [0][-]{chapter.11}{Using Plugin Layers}{}
+\BOOKMARK [1][-]{section.11.1}{Subclassing QgsPluginLayer}{chapter.11}
+\BOOKMARK [0][-]{chapter.12}{Developing Python Plugins}{}
+\BOOKMARK [1][-]{section.12.1}{Writing a plugin}{chapter.12}
+\BOOKMARK [1][-]{section.12.2}{Creating necessary files}{chapter.12}
+\BOOKMARK [1][-]{section.12.3}{Writing code}{chapter.12}
+\BOOKMARK [1][-]{section.12.4}{Documentation}{chapter.12}
+\BOOKMARK [1][-]{section.12.5}{Code Snippets}{chapter.12}
+\BOOKMARK [1][-]{section.12.6}{Testing}{chapter.12}
+\BOOKMARK [1][-]{section.12.7}{Releasing the plugin}{chapter.12}
+\BOOKMARK [1][-]{section.12.8}{Remark: Configuring Your IDE on Windows}{chapter.12}
+\BOOKMARK [0][-]{chapter.13}{Indices and tables}{}

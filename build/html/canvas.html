@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Map Canvas &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Map Rendering and Printing" href="composer.html" />
+    <link rel="prev" title="Projections Support" href="crs.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="composer.html" title="Map Rendering and Printing"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="crs.html" title="Projections Support"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-map-canvas">
+<span id="canvas"></span><h1>Using Map Canvas<a class="headerlink" href="#using-map-canvas" title="Permalink to this headline">¶</a></h1>
+<p>The Map canvas widget is probably the most important widget within QGIS because it
+shows the map composed from overlaid map layers and allows interaction the map and layers.
+The canvas shows always a part of the map defined by the current canvas extent.
+The interaction is done through the use of <strong>map tools</strong>: there are tools for
+panning, zooming, identifying layers, measuring, vector editing and others.
+Similar to other graphics programs, there is always one tool active and the
+user can switch between the available tools.</p>
+<p>Map canvas is implemented as <tt class="xref docutils literal"><span class="pre">QgsMapCanvas</span></tt> class in <tt class="xref docutils literal"><span class="pre">qgis.gui</span></tt>
+module.  The implementation is based on the <a class="reference external" href="http://doc.qt.nokia.com/graphicsview.html">Qt Graphics View framework</a> This framework generally provides
+a surface and a view where custom graphics items are placed and user can
+interact with them.  We will assume that you are familiar enough with Qt to
+understand the concepts of the graphics scene, view and items.  If not,
+please read the overview of the framework.</p>
+<p>Whenever the map has been panned, zoomed in/out (or some other action
+triggers a refresh), the map is rendered again within the current extent.
+The layers are rendered to an image (using <tt class="xref docutils literal"><span class="pre">QgsMapRenderer</span></tt> class) and
+that image is then displayed in the canvas.  The graphics item (in terms of the
+Qt graphics view framework) responsible for showing the map is
+<tt class="xref docutils literal"><span class="pre">QgsMapCanvasMap</span></tt> class.  This class also controls refreshing of the
+rendered map. Besides this item which acts as a background, there may be more
+<strong>map canvas items</strong>.  Typical map canvas items are rubber bands (used for
+measuring, vector editing etc.) or vertex markers. The canvas items are usually
+used to give some visual feedback for map tools, for example, when creating a
+new polygon, the map tool creates a rubber band canvas item that shows the
+current shape of the polygon. All map canvas items are subclasses of
+<tt class="xref docutils literal"><span class="pre">QgsMapCanvasItem</span></tt> which adds some more functionality to the basic
+<tt class="docutils literal"><span class="pre">QGraphicsItem</span></tt> objects.</p>
+<p>To summarize, the map canvas architecture consists of three concepts:</p>
+<ul class="simple">
+<li>map canvas &#8212; for viewing of the map,</li>
+<li>map canvas items &#8212; additional items that can be displayed in map canvas,</li>
+<li>map tools &#8212; for interaction with map canvas.</li>
+</ul>
+<div class="section" id="embedding-map-canvas">
+<h2>Embedding Map Canvas<a class="headerlink" href="#embedding-map-canvas" title="Permalink to this headline">¶</a></h2>
+<p>Map canvas is a widget like any other Qt widget, so using it is as simple as
+creating and showing it:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">canvas</span> <span class="o">=</span> <span class="n">QgsMapCanvas</span><span class="p">()</span>
+<span class="n">canvas</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>This produces a standalone window with map canvas. It can be also embedded into
+an existing widget or window. When using .ui files and Qt Designer, place a
+<tt class="docutils literal"><span class="pre">QWidget</span></tt> on the form and promote it to a new class: set <tt class="docutils literal"><span class="pre">QgsMapCanvas</span></tt> as
+class name and set <tt class="docutils literal"><span class="pre">qgis.gui</span></tt> as header file. The <tt class="docutils literal"><span class="pre">pyuic4</span></tt> utility will
+take care of it. This is a very convenient way of embedding the canvas. The
+other possibility is to manually write the code to construct map canvas and
+other widgets (as children of a main window or dialog) and create a layout.</p>
+<p>By default, map canvas has black background and does not use anti-aliasing. To
+set white background and enable anti-aliasing for smooth rendering:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">canvas</span><span class="o">.</span><span class="n">setCanvasColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">)</span>
+<span class="n">canvas</span><span class="o">.</span><span class="n">enableAntiAliasing</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(In case you are wondering, <tt class="docutils literal"><span class="pre">Qt</span></tt> comes from <tt class="docutils literal"><span class="pre">PyQt4.QtCore</span></tt> module and
+<tt class="docutils literal"><span class="pre">Qt.white</span></tt> is one of the predefined <tt class="docutils literal"><span class="pre">QColor</span></tt> instances.)</p>
+<p>Now it is time to add some map layers. We will first open a layer and add it to
+the map layer registry.  Then we will set the canvas extent and set the list of
+layers for canvas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">layer</span> <span class="o">=</span> <span class="n">QgsVectorLayer</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">provider</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">layer</span><span class="o">.</span><span class="n">isValid</span><span class="p">():</span>
+  <span class="k">raise</span> <span class="ne">IOError</span><span class="p">,</span> <span class="s">&quot;Failed to open the layer&quot;</span>
+
+<span class="c"># add layer to the registry</span>
+<span class="n">QgsMapLayerRegistry</span><span class="o">.</span><span class="n">instance</span><span class="p">()</span><span class="o">.</span><span class="n">addMapLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+
+<span class="c"># set extent to the extent of our layer</span>
+<span class="n">canvas</span><span class="o">.</span><span class="n">setExtent</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">extent</span><span class="p">())</span>
+
+<span class="c"># set the map canvas layer set</span>
+<span class="n">canvas</span><span class="o">.</span><span class="n">setLayerSet</span><span class="p">(</span> <span class="p">[</span> <span class="n">QgsMapCanvasLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>After executing these commands, the canvas should show the layer you have loaded.</p>
+</div>
+<div class="section" id="using-map-tools-with-canvas">
+<h2>Using Map Tools with Canvas<a class="headerlink" href="#using-map-tools-with-canvas" title="Permalink to this headline">¶</a></h2>
+<p>The following example constructs a window that contains a map canvas and basic
+map tools for map panning and zooming.  Actions are created for activation of
+each tool: panning is done with <tt class="xref docutils literal"><span class="pre">QgsMapToolPan</span></tt>, zooming in/out with a
+pair of <tt class="xref docutils literal"><span class="pre">QgsMapToolZoom</span></tt> instances. The actions are set as checkable and
+later assigned to the tools to allows automatic handling of checked/unchecked
+state of the actions &#8211; when a map tool gets activated, its action is marked as
+selected and the action of the previous map tool is deselected. The map tools
+are activated using <tt class="xref docutils literal"><span class="pre">setMapTool()</span></tt> method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">qgis.gui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="n">QAction</span><span class="p">,</span> <span class="n">QMainWindow</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="n">SIGNAL</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QString</span>
+
+<span class="k">class</span> <span class="nc">MyWnd</span><span class="p">(</span><span class="n">QMainWindow</span><span class="p">):</span>
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">layer</span><span class="p">):</span>
+    <span class="n">QMainWindow</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span> <span class="o">=</span> <span class="n">QgsMapCanvas</span><span class="p">()</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setCanvasColor</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">white</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setExtent</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">extent</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setLayerSet</span><span class="p">(</span> <span class="p">[</span> <span class="n">QgsMapCanvasLayer</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+
+    <span class="n">actionZoomIn</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">QString</span><span class="p">(</span><span class="s">&quot;Zoom in&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+    <span class="n">actionZoomOut</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">QString</span><span class="p">(</span><span class="s">&quot;Zoom out&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+    <span class="n">actionPan</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">QString</span><span class="p">(</span><span class="s">&quot;Pan&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="p">)</span>
+
+    <span class="n">actionZoomIn</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">actionZoomOut</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">actionPan</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">actionZoomIn</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;triggered()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomIn</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">actionZoomOut</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;triggered()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">zoomOut</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">actionPan</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;triggered()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">pan</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addToolBar</span><span class="p">(</span><span class="s">&quot;Canvas actions&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">actionZoomIn</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">actionZoomOut</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolbar</span><span class="o">.</span><span class="n">addAction</span><span class="p">(</span><span class="n">actionPan</span><span class="p">)</span>
+
+    <span class="c"># create the map tools</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolPan</span> <span class="o">=</span> <span class="n">QgsMapToolPan</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolPan</span><span class="o">.</span><span class="n">setAction</span><span class="p">(</span><span class="n">actionPan</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolZoomIn</span> <span class="o">=</span> <span class="n">QgsMapToolZoom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span> <span class="c"># false = in</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolZoomIn</span><span class="o">.</span><span class="n">setAction</span><span class="p">(</span><span class="n">actionZoomIn</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolZoomOut</span> <span class="o">=</span> <span class="n">QgsMapToolZoom</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span> <span class="c"># true = out</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">toolZoomOut</span><span class="o">.</span><span class="n">setAction</span><span class="p">(</span><span class="n">actionZoomOut</span><span class="p">)</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">pan</span><span class="p">()</span>
+
+  <span class="k">def</span> <span class="nf">zoomIn</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setMapTool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toolZoomIn</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">zoomOut</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setMapTool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toolZoomOut</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">pan</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">setMapTool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">toolPan</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>You can put the above code to a file, e.g. <tt class="docutils literal"><span class="pre">mywnd.py</span></tt> and try it out in
+Python console within QGIS.  This code will put the currently selected layer
+into newly created canvas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">mywnd</span>
+<span class="n">w</span> <span class="o">=</span> <span class="n">mywnd</span><span class="o">.</span><span class="n">MyWnd</span><span class="p">(</span><span class="n">qgis</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">activeLayer</span><span class="p">())</span>
+<span class="n">w</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Just make sure that the <tt class="docutils literal"><span class="pre">mywnd.py</span></tt> file is located within Python search path
+(<tt class="docutils literal"><span class="pre">sys.path</span></tt>). If it isn&#8217;t, you can simply add it: <tt class="docutils literal"><span class="pre">sys.path.insert(0,</span>
+<span class="pre">'/my/path')</span></tt> &#8212; otherwise the import statement will fail, not finding the
+module.</p>
+</div>
+<div class="section" id="rubber-bands-and-vertex-markers">
+<h2>Rubber Bands and Vertex Markers<a class="headerlink" href="#rubber-bands-and-vertex-markers" title="Permalink to this headline">¶</a></h2>
+<p>To show some additional data on top of the map in canvas, use map canvas items.
+It is possible to create custom canvas item classes (covered below), however
+there are two useful canvas item classes for convenience:
+<tt class="xref docutils literal"><span class="pre">QgsRubberBand</span></tt> for drawing polylines or polygons, and
+<tt class="xref docutils literal"><span class="pre">QgsVertexMarker</span></tt> for drawing points.  They both work with map
+coordinates, so the shape is moved/scaled automatically when the canvas is
+being panned or zoomed.</p>
+<p>To show a polyline:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">r</span> <span class="o">=</span> <span class="n">QgsRubberBand</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">False</span><span class="p">)</span>  <span class="c"># False = not a polygon</span>
+<span class="n">points</span> <span class="o">=</span> <span class="p">[</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span>
+<span class="n">r</span><span class="o">.</span><span class="n">setToGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPolyline</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To show a polygon:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">r</span> <span class="o">=</span> <span class="n">QgsRubberBand</span><span class="p">(</span><span class="n">canvas</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>  <span class="c"># True = a polygon</span>
+<span class="n">points</span> <span class="o">=</span> <span class="p">[</span> <span class="p">[</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span> <span class="p">]</span>
+<span class="n">r</span><span class="o">.</span><span class="n">setToGeometry</span><span class="p">(</span><span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPolygon</span><span class="p">(</span><span class="n">points</span><span class="p">),</span> <span class="bp">None</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that points for polygon is not a plain list: in fact, it is a list of
+rings containing linear rings of the polygon: first ring is the outer border,
+further (optional) rings correspond to holes in the polygon.</p>
+<p>Rubber bands allow some customization, namely to change their color and line
+width:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">r</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">))</span>
+<span class="n">r</span><span class="o">.</span><span class="n">setWidth</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The canvas items are bound to the canvas scene. To temporarily hide them (and show again, use
+the <tt class="xref docutils literal"><span class="pre">hide()</span></tt> and <tt class="xref docutils literal"><span class="pre">show()</span></tt> combo. To completely remove the item, you have to remove it
+from the scene of the canvas:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">canvas</span><span class="o">.</span><span class="n">scene</span><span class="p">()</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>(in C++ it&#8217;s possible to just delete the item, however in Python <tt class="docutils literal"><span class="pre">del</span> <span class="pre">r</span></tt>
+would just delete the reference and the object will still exist as it is owned
+by the canvas)</p>
+<p>Rubber band can be also used for drawing points, however
+<tt class="xref docutils literal"><span class="pre">QgsVertexMarker</span></tt> class is better suited for this
+(<tt class="xref docutils literal"><span class="pre">QgsRubberBand</span></tt> would only draw a rectangle around the desired point).
+How to use the vertex marker:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">m</span> <span class="o">=</span> <span class="n">QgsVertexMarker</span><span class="p">(</span><span class="n">canvas</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">setCenter</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>This will draw a red cross on position [0,0]. It is possible to customize the
+icon type, size, color and pen width:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">m</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span>
+<span class="n">m</span><span class="o">.</span><span class="n">setIconSize</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">m</span><span class="o">.</span><span class="n">setIconType</span><span class="p">(</span><span class="n">QgsVertexMarker</span><span class="o">.</span><span class="n">ICON_BOX</span><span class="p">)</span> <span class="c"># or ICON_CROSS, ICON_X</span>
+<span class="n">m</span><span class="o">.</span><span class="n">setPenWidth</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>For temprary hiding of vertex markers and removing them from canvas, the same
+applies as for the rubber bands.</p>
+</div>
+<div class="section" id="writing-custom-map-tools">
+<h2>Writing Custom Map Tools<a class="headerlink" href="#writing-custom-map-tools" title="Permalink to this headline">¶</a></h2>
+<p><strong>TODO:</strong> how to create a map tool</p>
+</div>
+<div class="section" id="writing-custom-map-canvas-items">
+<h2>Writing Custom Map Canvas Items<a class="headerlink" href="#writing-custom-map-canvas-items" title="Permalink to this headline">¶</a></h2>
+<p><strong>TODO:</strong> how to create a map canvas item</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Using Map Canvas</a><ul>
+<li><a class="reference external" href="#embedding-map-canvas">Embedding Map Canvas</a></li>
+<li><a class="reference external" href="#using-map-tools-with-canvas">Using Map Tools with Canvas</a></li>
+<li><a class="reference external" href="#rubber-bands-and-vertex-markers">Rubber Bands and Vertex Markers</a></li>
+<li><a class="reference external" href="#writing-custom-map-tools">Writing Custom Map Tools</a></li>
+<li><a class="reference external" href="#writing-custom-map-canvas-items">Writing Custom Map Canvas Items</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="crs.html"
+                                  title="previous chapter">Projections Support</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="composer.html"
+                                  title="next chapter">Map Rendering and Printing</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/canvas.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="composer.html" title="Map Rendering and Printing"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="crs.html" title="Projections Support"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

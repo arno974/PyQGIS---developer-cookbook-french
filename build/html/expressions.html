@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Expressions, Filtering and Calculating Values &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Measuring" href="measure.html" />
+    <link rel="prev" title="Map Rendering and Printing" href="composer.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="measure.html" title="Measuring"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="composer.html" title="Map Rendering and Printing"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="expressions-filtering-and-calculating-values">
+<span id="expressions"></span><h1>Expressions, Filtering and Calculating Values<a class="headerlink" href="#expressions-filtering-and-calculating-values" title="Permalink to this headline">¶</a></h1>
+<p>QGIS has some support for parsing of SQL-like expressions. Only a small subset of SQL syntax is supported.
+The expressions can be evaluated either as boolean predicates (returning True or False) or as functions (returning a scalar value).</p>
+<p>Three basic types are supported:</p>
+<ul class="simple">
+<li>number &#8212; both whole numbers and decimal numbers, e.g. <tt class="docutils literal"><span class="pre">123</span></tt>, <tt class="docutils literal"><span class="pre">3.14</span></tt></li>
+<li>string &#8212; they have to be enclosed in single quotes: <tt class="docutils literal"><span class="pre">'hello</span> <span class="pre">world'</span></tt></li>
+<li>column reference &#8212; when evaluating, the reference is substituted with the actual value of the field. The names are not escaped.</li>
+</ul>
+<p>The following operations are available:</p>
+<ul class="simple">
+<li>arithmetic operators: <tt class="docutils literal"><span class="pre">+</span></tt>, <tt class="docutils literal"><span class="pre">-</span></tt>, <tt class="docutils literal"><span class="pre">*</span></tt>, <tt class="docutils literal"><span class="pre">/</span></tt>, <tt class="docutils literal"><span class="pre">^</span></tt></li>
+<li>parentheses: for enforcing the operator precedence: <tt class="docutils literal"><span class="pre">(1</span> <span class="pre">+</span> <span class="pre">1)</span> <span class="pre">*</span> <span class="pre">3</span></tt></li>
+<li>unary plus and minus: <tt class="docutils literal"><span class="pre">-12</span></tt>, <tt class="docutils literal"><span class="pre">+5</span></tt></li>
+<li>mathematical functions: <tt class="docutils literal"><span class="pre">sqrt</span></tt>, <tt class="docutils literal"><span class="pre">sin</span></tt>, <tt class="docutils literal"><span class="pre">cos</span></tt>, <tt class="docutils literal"><span class="pre">tan</span></tt>, <tt class="docutils literal"><span class="pre">asin</span></tt>, <tt class="docutils literal"><span class="pre">acos</span></tt>, <tt class="docutils literal"><span class="pre">atan</span></tt></li>
+<li>geometry functions: <tt class="docutils literal"><span class="pre">$area</span></tt>, <tt class="docutils literal"><span class="pre">$length</span></tt></li>
+<li>conversion functions: <tt class="docutils literal"><span class="pre">to</span> <span class="pre">int</span></tt>, <tt class="docutils literal"><span class="pre">to</span> <span class="pre">real</span></tt>, <tt class="docutils literal"><span class="pre">to</span> <span class="pre">string</span></tt></li>
+</ul>
+<p>And following predicates are supported:</p>
+<ul class="simple">
+<li>comparison: <tt class="docutils literal"><span class="pre">=</span></tt>, <tt class="docutils literal"><span class="pre">!=</span></tt>, <tt class="docutils literal"><span class="pre">&gt;</span></tt>, <tt class="docutils literal"><span class="pre">&gt;=</span></tt>, <tt class="docutils literal"><span class="pre">&lt;</span></tt>, <tt class="docutils literal"><span class="pre">&lt;=</span></tt></li>
+<li>pattern matching: <tt class="docutils literal"><span class="pre">LIKE</span></tt> (using % and _), <tt class="docutils literal"><span class="pre">~</span></tt> (regular expressions)</li>
+<li>logical predicates: <tt class="docutils literal"><span class="pre">AND</span></tt>, <tt class="docutils literal"><span class="pre">OR</span></tt>, <tt class="docutils literal"><span class="pre">NOT</span></tt></li>
+<li>NULL value checking: <tt class="docutils literal"><span class="pre">IS</span> <span class="pre">NULL</span></tt>, <tt class="docutils literal"><span class="pre">IS</span> <span class="pre">NOT</span> <span class="pre">NULL</span></tt></li>
+</ul>
+<p><strong>Compatibility note:</strong> mathematical, geometry, conversion functions and power operator <tt class="docutils literal"><span class="pre">^</span></tt> are available from QGIS 1.4.</p>
+<p>Examples of predicates:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">1</span> <span class="pre">+</span> <span class="pre">2</span> <span class="pre">=</span> <span class="pre">3</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sin(angle)</span> <span class="pre">&gt;</span> <span class="pre">0</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">'Hello'</span> <span class="pre">LIKE</span> <span class="pre">'He%'</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">(x</span> <span class="pre">&gt;</span> <span class="pre">10</span> <span class="pre">AND</span> <span class="pre">y</span> <span class="pre">&gt;</span> <span class="pre">10)</span> <span class="pre">OR</span> <span class="pre">z</span> <span class="pre">=</span> <span class="pre">0</span></tt></li>
+</ul>
+<p>Examples of scalar expressions:</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">2</span> <span class="pre">^</span> <span class="pre">10</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">sqrt(val)</span></tt></li>
+<li><tt class="docutils literal"><span class="pre">$length</span> <span class="pre">+</span> <span class="pre">1</span></tt></li>
+</ul>
+<div class="section" id="parsing-expressions">
+<h2>Parsing Expressions<a class="headerlink" href="#parsing-expressions" title="Permalink to this headline">¶</a></h2>
+<p><strong>TODO:</strong> parsing, error handling</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">s</span> <span class="o">=</span> <span class="n">QgsSearchString</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;1 + 1 = 2&quot;</span><span class="p">)</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">setString</span><span class="p">(</span><span class="s">&quot;1 + 1 =&quot;</span><span class="p">)</span>
+<span class="go">False</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">s</span><span class="o">.</span><span class="n">parserErrorMsg</span><span class="p">()</span>
+<span class="go">PyQt4.QtCore.QString(u&#39;syntax error, unexpected $end&#39;)</span>
+</pre></div>
+</div>
+<p><strong>TODO:</strong> working with the tree, evaluation as a predicate, as a function, error handling</p>
+</div>
+<div class="section" id="evaluating-expressions">
+<h2>Evaluating Expressions<a class="headerlink" href="#evaluating-expressions" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">st</span> <span class="o">=</span> <span class="n">ss</span><span class="o">.</span><span class="n">tree</span><span class="p">()</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">st</span><span class="p">:</span>
+  <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">,</span> <span class="s">&quot;empty expression was used&quot;</span>
+
+<span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">makeSearchString</span><span class="p">()</span>
+
+<span class="n">res</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">checkAgainst</span><span class="p">(</span><span class="n">fields</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">attributeMap</span><span class="p">())</span>
+
+<span class="n">res</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">st</span><span class="o">.</span><span class="n">getValue</span><span class="p">(</span><span class="n">st</span><span class="p">,</span> <span class="n">fields</span><span class="p">,</span> <span class="n">feature</span><span class="o">.</span><span class="n">attributeMap</span><span class="p">(),</span> <span class="n">feature</span><span class="o">.</span><span class="n">geometry</span><span class="p">())</span>
+
+<span class="k">print</span> <span class="n">st</span><span class="o">.</span><span class="n">errorMsg</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Expressions, Filtering and Calculating Values</a><ul>
+<li><a class="reference external" href="#parsing-expressions">Parsing Expressions</a></li>
+<li><a class="reference external" href="#evaluating-expressions">Evaluating Expressions</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="composer.html"
+                                  title="previous chapter">Map Rendering and Printing</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="measure.html"
+                                  title="next chapter">Measuring</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/expressions.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="measure.html" title="Measuring"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="composer.html" title="Map Rendering and Printing"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,409 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Developing Python Plugins &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="prev" title="Using Plugin Layers" href="pluginlayer.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pluginlayer.html" title="Using Plugin Layers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="developing-python-plugins">
+<span id="plugins"></span><h1>Developing Python Plugins<a class="headerlink" href="#developing-python-plugins" title="Permalink to this headline">¶</a></h1>
+<p>It is possible to create plugins in Python programming language. In comparison with classical plugins written in C++ these should be easier to write,
+understand, maintain and distribute due the dynamic nature of the Python language.</p>
+<p>Python plugins are listed together with C++ plugins in QGIS plugin manager. They&#8217;re being searched for in these paths:</p>
+<blockquote>
+<ul class="simple">
+<li>UNIX/Mac: <tt class="docutils literal"><span class="pre">~/.qgis/python/plugins</span></tt> and <tt class="docutils literal"><span class="pre">(qgis_prefix)/share/qgis/python/plugins</span></tt></li>
+<li>Windows: <tt class="docutils literal"><span class="pre">~/.qgis/python/plugins</span></tt> and <tt class="docutils literal"><span class="pre">(qgis_prefix)/python/plugins</span></tt></li>
+</ul>
+</blockquote>
+<p>Home directory (denoted by above <tt class="docutils literal"><span class="pre">~</span></tt>) on Windows is usually something like <tt class="docutils literal"><span class="pre">C:\Documents</span> <span class="pre">and</span> <span class="pre">Settings\(user)</span></tt>.
+Subdirectories of these paths are considered as Python packages that can be imported to QGIS as plugins.</p>
+<p>Steps:</p>
+<ol class="arabic simple">
+<li><em>Idea</em>: Have an idea about what you want to do with your new QGIS plugin.
+Why do you do it?
+What problem do you want to solve?
+Is there already another plugin for that problem?</li>
+<li><em>Create files</em>: Create the files described next.
+A starting point (<tt class="docutils literal"><span class="pre">__init.py__</span></tt>).
+A main python plugin body (<tt class="docutils literal"><span class="pre">plugin.py</span></tt>).
+A form in QT-Designer (<tt class="docutils literal"><span class="pre">form.ui</span></tt>), with its <tt class="docutils literal"><span class="pre">resources.qrc</span></tt>.</li>
+<li><em>Write code</em>: Write the code inside the <tt class="docutils literal"><span class="pre">plugin.py</span></tt></li>
+<li><em>Test</em>: Close and re-open QGIS and import your plugin again. Check if everything is OK.</li>
+<li><em>Publish</em>: Publish your plugin in QGIS repository or make your own repository as an &#8220;arsenal&#8221; of personal &#8220;GIS weapons&#8221;</li>
+</ol>
+<div class="section" id="writing-a-plugin">
+<h2>Writing a plugin<a class="headerlink" href="#writing-a-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Since the introduction of python plugins in QGIS, a number of plugins have appeared -
+on <a class="reference external" href="http://www.qgis.org/wiki/Python_Plugin_Repositories">Plugin Repositories wiki page</a> you can find some of them,
+you can use their source to learn more about programming with PyQGIS or find out whether you are not duplicating development effort.
+Ready to create a plugin but no idea what to do? <a class="reference external" href="http://www.qgis.org/wiki/Python_Plugin_Ideas">Python Plugin Ideas wiki page</a> lists wishes from the community!</p>
+</div>
+<div class="section" id="creating-necessary-files">
+<h2>Creating necessary files<a class="headerlink" href="#creating-necessary-files" title="Permalink to this headline">¶</a></h2>
+<p>Here&#8217;s the directory structure of our example plugin:</p>
+<div class="highlight-python"><pre>PYTHON_PLUGINS_PATH/
+  testplug/
+    __init__.py
+    plugin.py
+    resources.qrc
+    resources.py
+    form.ui
+    form.py</pre>
+</div>
+<p>What is the meaning of the files:</p>
+<ul class="simple">
+<li>__init__.py = The starting point of the plugin. Contains general info, version, name and main class.</li>
+<li>plugin.py = The main working code of the plugin. Contains all the information about the actions of the plugin and the main code.</li>
+<li>resources.qrc = The .xml document created by QT-Designer. Contains relative paths to resources of the forms.</li>
+<li>resources.py = The translation of the .qrc file described above to Python.</li>
+<li>form.ui = The GUI created by QT-Designer.</li>
+<li>form.py = The translation of the form.ui described above to Python.</li>
+</ul>
+<p><a class="reference external" href="http://pyqgis.org/builder/plugin_builder.py">Here</a> and <a class="reference external" href="http://www.dimitrisk.gr/qgis/creator/">there</a> are two automated ways of creating
+the basic files (skeleton) of a typical QGIS Python plugin. Useful to help you start with a typical plugin.</p>
+</div>
+<div class="section" id="writing-code">
+<h2>Writing code<a class="headerlink" href="#writing-code" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="init-py">
+<h3>__init__.py<a class="headerlink" href="#init-py" title="Permalink to this headline">¶</a></h3>
+<p>First, plugin manager needs to retrieve some basic information about the plugin such as its name, description etc.
+File <tt class="docutils literal"><span class="pre">__init__.py</span></tt> is the right place where to put this information:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">name</span><span class="p">():</span>
+  <span class="k">return</span> <span class="s">&quot;My testing plugin&quot;</span>
+
+<span class="k">def</span> <span class="nf">description</span><span class="p">():</span>
+  <span class="k">return</span> <span class="s">&quot;This plugin has no real use.&quot;</span>
+
+<span class="k">def</span> <span class="nf">version</span><span class="p">():</span>
+  <span class="k">return</span> <span class="s">&quot;Version 0.1&quot;</span>
+
+<span class="k">def</span> <span class="nf">qgisMinimumVersion</span><span class="p">():</span>
+  <span class="k">return</span> <span class="s">&quot;1.0&quot;</span>
+
+<span class="k">def</span> <span class="nf">authorName</span><span class="p">():</span>
+  <span class="k">return</span> <span class="s">&quot;Developer&quot;</span>
+
+<span class="k">def</span> <span class="nf">classFactory</span><span class="p">(</span><span class="n">iface</span><span class="p">):</span>
+  <span class="c"># load TestPlugin class from file testplugin.py</span>
+  <span class="kn">from</span> <span class="nn">testplugin</span> <span class="kn">import</span> <span class="n">TestPlugin</span>
+  <span class="k">return</span> <span class="n">TestPlugin</span><span class="p">(</span><span class="n">iface</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="plugin-py">
+<h3>plugin.py<a class="headerlink" href="#plugin-py" title="Permalink to this headline">¶</a></h3>
+<p>One thing worth mentioning is <tt class="docutils literal"><span class="pre">classFactory()</span></tt> function which is called when the plugin gets loaded to QGIS.
+It receives reference to instance of <tt class="xref docutils literal"><span class="pre">QgisInterface</span></tt> and must return instance of your plugin - in our case it&#8217;s called <tt class="docutils literal"><span class="pre">TestPlugin</span></tt>.
+This is how should this class look like (e.g. <tt class="docutils literal"><span class="pre">testplugin.py</span></tt>):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">PyQt4.QtCore</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># initialize Qt resources from file resouces.py</span>
+<span class="kn">import</span> <span class="nn">resources</span>
+
+<span class="k">class</span> <span class="nc">TestPlugin</span><span class="p">:</span>
+
+  <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">iface</span><span class="p">):</span>
+    <span class="c"># save reference to the QGIS interface</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iface</span> <span class="o">=</span> <span class="n">iface</span>
+
+  <span class="k">def</span> <span class="nf">initGui</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># create action that will start plugin configuration</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">action</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="n">QIcon</span><span class="p">(</span><span class="s">&quot;:/plugins/testplug/icon.png&quot;</span><span class="p">),</span> <span class="s">&quot;Test plugin&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">mainWindow</span><span class="p">())</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">setWhatsThis</span><span class="p">(</span><span class="s">&quot;Configuration for test plugin&quot;</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="o">.</span><span class="n">setStatusTip</span><span class="p">(</span><span class="s">&quot;This is status tip&quot;</span><span class="p">)</span>
+    <span class="n">QObject</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;triggered()&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">)</span>
+
+    <span class="c"># add toolbar button and menu item</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">addToolBarIcon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">addPluginToMenu</span><span class="p">(</span><span class="s">&quot;&amp;Test plugins&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+
+    <span class="c"># connect to signal renderComplete which is emitted when canvas rendering is done</span>
+    <span class="n">QObject</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">(),</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;renderComplete(QPainter *)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderTest</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">unload</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># remove the plugin menu item and icon</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">removePluginMenu</span><span class="p">(</span><span class="s">&quot;&amp;Test plugins&quot;</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">removeToolBarIcon</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
+
+    <span class="c"># disconnect form signal of the canvas</span>
+    <span class="n">QObject</span><span class="o">.</span><span class="n">disconnect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">MapCanvas</span><span class="p">(),</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;renderComplete(QPainter *)&quot;</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">renderTest</span><span class="p">)</span>
+
+  <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+    <span class="c"># create and show a configuration dialog or something similar</span>
+    <span class="k">print</span> <span class="s">&quot;TestPlugin: run called!&quot;</span>
+
+  <span class="k">def</span> <span class="nf">renderTest</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">painter</span><span class="p">):</span>
+    <span class="c"># use painter for drawing to map canvas</span>
+    <span class="k">print</span> <span class="s">&quot;TestPlugin: renderTest called!&quot;</span>
+</pre></div>
+</div>
+<p>Only functions of the plugin that must exist are <tt class="docutils literal"><span class="pre">initGui()</span></tt> and <tt class="docutils literal"><span class="pre">unload()</span></tt>.
+These functions are called when plugin is loaded and unloaded.</p>
+</div>
+<div class="section" id="resource-file">
+<h3>Resource File<a class="headerlink" href="#resource-file" title="Permalink to this headline">¶</a></h3>
+<p>You can see that in <tt class="docutils literal"><span class="pre">initGui()</span></tt> we&#8217;ve used an icon from the resource file (called <tt class="docutils literal"><span class="pre">resources.qrc</span></tt> in our case):</p>
+<div class="highlight-python"><pre>&lt;RCC&gt;
+  &lt;qresource prefix="/plugins/testplug" &gt;
+     &lt;file&gt;icon.png&lt;/file&gt;
+  &lt;/qresource&gt;
+&lt;/RCC&gt;</pre>
+</div>
+<p>It is good to use a prefix that will not collide with other plugins or any parts of QGIS, otherwise you might get resources you did not want.
+Now you just need to generate a Python file that will contain the resources. It&#8217;s done with <strong>pyrcc4</strong> command:</p>
+<div class="highlight-python"><pre>pyrcc4 -o resources.py resources.qrc</pre>
+</div>
+<p>And that&#8217;s all... nothing complicated :)
+If you&#8217;ve done everything correctly you should be able to find and load your plugin in plugin manager and see a message in console
+when toolbar icon or appopriate menu item is selected.</p>
+<p>When working on a real plugin it&#8217;s wise to write the plugin in another (working) directory and create a makefile which will
+generate UI + resource files and install the plugin to your QGIS installation.</p>
+</div>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p><em>This documentation method requires Qgis version 1.5.</em></p>
+<p>The documentation for the plugin can be written as HTML help files. The <tt class="xref docutils literal"><span class="pre">qgis.utils</span></tt> module provides a function, <tt class="xref docutils literal"><span class="pre">showPluginHelp()</span></tt>
+which will open the help file users browser, in the same way as other QGIS help.</p>
+<p>The <tt class="xref docutils literal"><span class="pre">showPluginHelp`()</span></tt> function looks for help files in the same directory as the calling module.
+It will look for, in turn, <tt class="docutils literal"><span class="pre">index-ll_cc.html</span></tt>, <tt class="docutils literal"><span class="pre">index-ll.html</span></tt>, <tt class="docutils literal"><span class="pre">index-en.html</span></tt>, <tt class="docutils literal"><span class="pre">index-en_us.html</span></tt> and <tt class="docutils literal"><span class="pre">index.html</span></tt>,
+displaying whichever it finds first. Here <tt class="docutils literal"><span class="pre">ll_cc</span></tt> is the QGIS locale. This allows multiple translations of the documentation to be included with the plugin.</p>
+<p>The <tt class="xref docutils literal"><span class="pre">showPluginHelp()</span></tt> function can also take parameters packageName, which identifies a specific plugin for which the help will be displayed,
+filename, which can replace &#8220;index&#8221; in the names of files being searched, and section, which is the name of an html anchor tag in the document
+on which the browser will be positioned.</p>
+</div>
+<div class="section" id="code-snippets">
+<h2>Code Snippets<a class="headerlink" href="#code-snippets" title="Permalink to this headline">¶</a></h2>
+<p>This section features code snippets to facilitate plugin development.</p>
+<div class="section" id="how-to-call-a-method-by-a-key-shortcut">
+<h3>How to call a method by a key shortcut<a class="headerlink" href="#how-to-call-a-method-by-a-key-shortcut" title="Permalink to this headline">¶</a></h3>
+<p>In the plug-in add to the <tt class="docutils literal"><span class="pre">initGui()</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">keyAction</span> <span class="o">=</span> <span class="n">QAction</span><span class="p">(</span><span class="s">&quot;Test Plugin&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">mainWindow</span><span class="p">())</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">registerMainWindowAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyAction</span><span class="p">,</span> <span class="s">&quot;F7&quot;</span><span class="p">)</span> <span class="c"># action1 is triggered by the F7 key</span>
+<span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">addPluginToMenu</span><span class="p">(</span><span class="s">&quot;&amp;Test plugins&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keyAction</span><span class="p">)</span>
+<span class="n">QObject</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyAction</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">(</span><span class="s">&quot;triggered()&quot;</span><span class="p">),</span><span class="bp">self</span><span class="o">.</span><span class="n">keyActionF7</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To <tt class="docutils literal"><span class="pre">unload()</span></tt> add:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">unregisterMainWindowAction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keyAction</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The method that is called when F7 is pressed:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">keyActionF7</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+  <span class="n">QMessageBox</span><span class="o">.</span><span class="n">information</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">mainWindow</span><span class="p">(),</span><span class="s">&quot;Ok&quot;</span><span class="p">,</span> <span class="s">&quot;You pressed F7&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-toggle-layers-work-around">
+<h3>How to toggle Layers (work around)<a class="headerlink" href="#how-to-toggle-layers-work-around" title="Permalink to this headline">¶</a></h3>
+<p><em>Note:</em> from QGIS 1.5 there is <tt class="xref docutils literal"><span class="pre">QgsLegendInterface</span></tt> class that allows some manipulation with list of layers within legend.</p>
+<p>As there is currently no method to directly access the layers in the legend, here is a workaround how to toggle the layers using layer transparency:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">toggleLayer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lyrNr</span><span class="p">):</span>
+  <span class="n">lyr</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">layer</span><span class="p">(</span><span class="n">lyrNr</span><span class="p">)</span>
+  <span class="k">if</span> <span class="n">lyr</span><span class="p">:</span>
+    <span class="n">cTran</span> <span class="o">=</span> <span class="n">lyr</span><span class="o">.</span><span class="n">getTransparency</span><span class="p">()</span>
+    <span class="n">lyr</span><span class="o">.</span><span class="n">setTransparency</span><span class="p">(</span><span class="mi">0</span> <span class="k">if</span> <span class="n">cTran</span> <span class="o">&gt;</span> <span class="mi">100</span> <span class="k">else</span> <span class="mi">255</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">iface</span><span class="o">.</span><span class="n">mapCanvas</span><span class="p">()</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The method requires the layer number (0 being the top most) and can be called by:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">toggleLayer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-access-attribute-table-of-selected-features">
+<h3>How to access attribute table of selected features<a class="headerlink" href="#how-to-access-attribute-table-of-selected-features" title="Permalink to this headline">¶</a></h3>
+<div class="highlight-python"><pre>def changeValue(self, value):
+  layer = self.iface.activeLayer()
+  if(layer):
+    nF = layer.selectedFeatureCount()
+    if (nF &gt; 0):
+    layer.startEditing()
+    ob = layer.selectedFeaturesIds()
+    b = QVariant(value)
+    if (nF &gt; 1):
+      for i in ob:
+      layer.changeAttributeValue(int(i),1,b) # 1 being the second column
+    else:
+      layer.changeAttributeValue(int(ob[0]),1,b) # 1 being the second column
+    layer.commitChanges()
+    else:
+      QMessageBox.critical(self.iface.mainWindow(),"Error", "Please select at least one feature from current layer")
+  else:
+    QMessageBox.critical(self.iface.mainWindow(),"Error","Please select a layer")</pre>
+</div>
+<p>The method requires the one parameter (the new value for the attribute field of the selected feature(s)) and can be called by:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="bp">self</span><span class="o">.</span><span class="n">changeValue</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="how-to-debug-a-plugin-using-pdb">
+<h3>How to debug a plugin using PDB<a class="headerlink" href="#how-to-debug-a-plugin-using-pdb" title="Permalink to this headline">¶</a></h3>
+<p>First add this code in the spot where you would like to debug:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># Use pdb for debugging</span>
+<span class="kn">import</span> <span class="nn">pdb</span>
+<span class="c"># These lines allow you to set a breakpoint in the app</span>
+<span class="n">pyqtRemoveInputHook</span><span class="p">()</span>
+<span class="n">pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Then run QGIS from the command line.</p>
+<p>On Linux do:</p>
+<p><strong>$ ./Qgis</strong></p>
+<p>On Mac OS X do:</p>
+<p><strong>$ /Applications/Qgis.app/Contents/MacOS/Qgis</strong></p>
+<p>And when the application hits your breakpoint you can type in the console!</p>
+</div>
+</div>
+<div class="section" id="testing">
+<h2>Testing<a class="headerlink" href="#testing" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="releasing-the-plugin">
+<h2>Releasing the plugin<a class="headerlink" href="#releasing-the-plugin" title="Permalink to this headline">¶</a></h2>
+<p>Once your plugin is ready and you think the plugin could be helpful for some people, do not hesitate to upload it to <a class="reference external" href="http://pyqgis.org/">PyQGIS plugin repository</a>.
+On that page you can find also packaging guidelines how to prepare the plugin to work well with the plugin installer.
+Or in case you would like to set up your own plugin repository, create a simple XML file that will list the plugins and their metadata,
+for examples see other <a class="reference external" href="http://www.qgis.org/wiki/Python_Plugin_Repositories">plugin repositories</a>.</p>
+</div>
+<div class="section" id="remark-configuring-your-ide-on-windows">
+<h2>Remark: Configuring Your IDE on Windows<a class="headerlink" href="#remark-configuring-your-ide-on-windows" title="Permalink to this headline">¶</a></h2>
+<p>On Linux there is no additional configuration needed to develop plug-ins. But on Windows you need to make sure you that you have the same
+environment settings and use the same libraries and interpreter as QGIS. The fastest way to do this, is to modify the startup batch file of QGIS.</p>
+<p>If you used the OSGeo4W Installer, you can find this under the bin folder of your OSGoeW install. Look for something like <tt class="docutils literal"><span class="pre">C:\OSGeo4W\bin\qgis-unstable.bat</span></tt>.</p>
+<p>I will illustrate how to set up the <a class="reference external" href="http://code.google.com/p/pyscripter">Pyscripter IDE</a>. Other IDE’s might require a slightly different approach:</p>
+<ul>
+<li><p class="first">Make a copy of qgis-unstable.bat and rename it pyscripter.bat.</p>
+</li>
+<li><p class="first">Open it in an editor. And remove the last line, the one that starts qgis.</p>
+</li>
+<li><p class="first">Add a line that points to the your pyscripter executable and add the commandline argument that sets the version of python to be used, in version 1.3 of qgis this is python 2.5.</p>
+</li>
+<li><p class="first">Also add the argument that points to the folder where pyscripter can find the python dll used by qgis, you can find this under the bin folder of your OSGeoW install:</p>
+<div class="highlight-python"><pre>@echo off
+SET OSGEO4W_ROOT=C:\OSGeo4W
+call "%OSGEO4W_ROOT%"\bin\o4w_env.bat
+call "%OSGEO4W_ROOT%"\bin\gdal16.bat
+@echo off
+path %PATH%;%GISBASE%\bin
+Start C:\pyscripter\pyscripter.exe --python25 --pythondllpath=C:\OSGeo4W\bin</pre>
+</div>
+</li>
+</ul>
+<p>Now when you double click this batch file and it will start pyscripter.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Developing Python Plugins</a><ul>
+<li><a class="reference external" href="#writing-a-plugin">Writing a plugin</a></li>
+<li><a class="reference external" href="#creating-necessary-files">Creating necessary files</a></li>
+<li><a class="reference external" href="#writing-code">Writing code</a><ul>
+<li><a class="reference external" href="#init-py">__init__.py</a></li>
+<li><a class="reference external" href="#plugin-py">plugin.py</a></li>
+<li><a class="reference external" href="#resource-file">Resource File</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#documentation">Documentation</a></li>
+<li><a class="reference external" href="#code-snippets">Code Snippets</a><ul>
+<li><a class="reference external" href="#how-to-call-a-method-by-a-key-shortcut">How to call a method by a key shortcut</a></li>
+<li><a class="reference external" href="#how-to-toggle-layers-work-around">How to toggle Layers (work around)</a></li>
+<li><a class="reference external" href="#how-to-access-attribute-table-of-selected-features">How to access attribute table of selected features</a></li>
+<li><a class="reference external" href="#how-to-debug-a-plugin-using-pdb">How to debug a plugin using PDB</a></li>
+</ul>
+</li>
+<li><a class="reference external" href="#testing">Testing</a></li>
+<li><a class="reference external" href="#releasing-the-plugin">Releasing the plugin</a></li>
+<li><a class="reference external" href="#remark-configuring-your-ide-on-windows">Remark: Configuring Your IDE on Windows</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="pluginlayer.html"
+                                  title="previous chapter">Using Plugin Layers</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/plugins.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pluginlayer.html" title="Using Plugin Layers"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

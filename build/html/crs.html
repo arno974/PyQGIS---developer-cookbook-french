@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Projections Support &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Using Map Canvas" href="canvas.html" />
+    <link rel="prev" title="Geometry Handling" href="geometry.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="canvas.html" title="Using Map Canvas"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="geometry.html" title="Geometry Handling"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="projections-support">
+<span id="crs"></span><h1>Projections Support<a class="headerlink" href="#projections-support" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="coordinate-reference-systems">
+<h2>Coordinate reference systems<a class="headerlink" href="#coordinate-reference-systems" title="Permalink to this headline">¶</a></h2>
+<p>Coordinate reference systems (CRS) are encapsulated by <tt class="xref docutils literal"><span class="pre">QgsCoordinateReferenceSystem</span></tt> class.
+Instances of this class can be created by several different ways:</p>
+<ul>
+<li><p class="first">specify CRS by its ID:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># PostGIS SRID 4326 is allocated for WGS84</span>
+<span class="n">crs</span> <span class="o">=</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">(</span><span class="mi">4326</span><span class="p">,</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="o">.</span><span class="n">PostgisCrsId</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>QGIS uses three different IDs for every reference system:</p>
+<ul class="simple">
+<li><tt class="xref docutils literal"><span class="pre">PostgisCrsId</span></tt> - IDs used within PostGIS databases.</li>
+<li><tt class="xref docutils literal"><span class="pre">InternalCrsId</span></tt> - IDs internally used in QGIS database.</li>
+<li><tt class="xref docutils literal"><span class="pre">EpsgCrsId</span></tt> - IDs assigned by the EPSG organization</li>
+</ul>
+<p>If not specified otherwise in second parameter, PostGIS SRID is used by default.</p>
+</li>
+<li><p class="first">specify CRS by its well-known text (WKT):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">wkt</span> <span class="o">=</span> <span class="s">&#39;GEOGCS[&quot;WGS84&quot;, DATUM[&quot;WGS84&quot;, SPHEROID[&quot;WGS84&quot;, 6378137.0, 298.257223563]],</span><span class="se">\</span>
+<span class="s">       PRIMEM[&quot;Greenwich&quot;, 0.0], UNIT[&quot;degree&quot;,0.017453292519943295],</span><span class="se">\</span>
+<span class="s">       AXIS[&quot;Longitude&quot;,EAST], AXIS[&quot;Latitude&quot;,NORTH]]&#39;</span>
+<span class="n">crs</span> <span class="o">=</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">(</span><span class="n">wkt</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">create invalid CRS and then use one of the <tt class="xref docutils literal"><span class="pre">create*()</span></tt> functions to initialize it. In following example we use Proj4 string to initialize the projection:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">crs</span> <span class="o">=</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">()</span>
+<span class="n">crs</span><span class="o">.</span><span class="n">createFromProj4</span><span class="p">(</span><span class="s">&quot;+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>It&#8217;s wise to check whether creation (i.e. lookup in the database) of the CRS has been successful: <tt class="xref docutils literal"><span class="pre">isValid()</span></tt> must return <tt class="xref xref docutils literal"><span class="pre">True</span></tt>.</p>
+<p>Note that for initialization of spatial reference systems QGIS needs to lookup appropriate values in its internal database <tt class="docutils literal"><span class="pre">srs.db</span></tt>.
+Thus in case you create an independent application you need to set paths correctly with <tt class="xref docutils literal"><span class="pre">QgsApplication.setPrefixPath()</span></tt> otherwise it will fail to find the database.
+If you are running the commands from QGIS python console or developing a plugin you do not care: everything is already set up for you.</p>
+<p>Accessing spatial reference system information:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="s">&quot;QGIS CRS ID:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">srsid</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;PostGIS SRID:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">srid</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;EPSG ID:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">epsg</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;Description:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">description</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;Projection Acronym:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">projectionAcronym</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;Ellipsoid Acronym:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">ellipsoidAcronym</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&quot;Proj4 String:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">proj4String</span><span class="p">()</span>
+<span class="c"># check whether it&#39;s geographic or projected coordinate system</span>
+<span class="k">print</span> <span class="s">&quot;Is geographic:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">geographicFlag</span><span class="p">()</span>
+<span class="c"># check type of map units in this CRS (values defined in QGis::units enum)</span>
+<span class="k">print</span> <span class="s">&quot;Map units:&quot;</span><span class="p">,</span> <span class="n">crs</span><span class="o">.</span><span class="n">mapUnits</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="projections">
+<h2>Projections<a class="headerlink" href="#projections" title="Permalink to this headline">¶</a></h2>
+<p>You can do transformation between different spatial reference systems by using <tt class="xref docutils literal"><span class="pre">QgsCoordinateTransform</span></tt> class.
+The easiest way to use it is to create source and destination CRS and construct <tt class="xref docutils literal"><span class="pre">QgsCoordinateTransform</span></tt> instance with them.
+Then just repeatedly call <tt class="xref docutils literal"><span class="pre">transform()</span></tt> function to do the transformation. By default it does forward transformation,
+but it is capable to do also inverse transformation:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">crsSrc</span> <span class="o">=</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">(</span><span class="mi">4326</span><span class="p">)</span>    <span class="c"># WGS 84</span>
+<span class="n">crsDest</span> <span class="o">=</span> <span class="n">QgsCoordinateReferenceSystem</span><span class="p">(</span><span class="mi">32633</span><span class="p">)</span>  <span class="c"># WGS 84 / UTM zone 33N</span>
+<span class="n">xform</span> <span class="o">=</span> <span class="n">QgsCoordinateTransform</span><span class="p">(</span><span class="n">crsSrc</span><span class="p">,</span> <span class="n">crsDest</span><span class="p">)</span>
+
+<span class="c"># forward transformation: src -&gt; dest</span>
+<span class="n">pt1</span> <span class="o">=</span> <span class="n">xform</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span><span class="mi">5</span><span class="p">))</span>
+<span class="k">print</span> <span class="s">&quot;Transformed point:&quot;</span><span class="p">,</span> <span class="n">pt1</span>
+
+<span class="c"># inverse transformation: dest -&gt; src</span>
+<span class="n">pt2</span> <span class="o">=</span> <span class="n">xform</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">QgsCoordinateTransform</span><span class="o">.</span><span class="n">ReverseTransform</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&quot;Transformed back:&quot;</span><span class="p">,</span> <span class="n">pt2</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Projections Support</a><ul>
+<li><a class="reference external" href="#coordinate-reference-systems">Coordinate reference systems</a></li>
+<li><a class="reference external" href="#projections">Projections</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="geometry.html"
+                                  title="previous chapter">Geometry Handling</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="canvas.html"
+                                  title="next chapter">Using Map Canvas</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/crs.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="canvas.html" title="Using Map Canvas"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="geometry.html" title="Geometry Handling"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

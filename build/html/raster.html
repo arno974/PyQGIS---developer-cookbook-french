@@ -1,0 +1,277 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Using Raster Layers &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Using Vector Layers" href="vector.html" />
+    <link rel="prev" title="Loading Layers" href="loadlayer.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="vector.html" title="Using Vector Layers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="loadlayer.html" title="Loading Layers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="using-raster-layers">
+<span id="raster"></span><h1>Using Raster Layers<a class="headerlink" href="#using-raster-layers" title="Permalink to this headline">¶</a></h1>
+<p>This sections lists various operations you can do with raster layers.</p>
+<div class="section" id="layer-details">
+<h2>Layer Details<a class="headerlink" href="#layer-details" title="Permalink to this headline">¶</a></h2>
+<p>A raster layer consists of one or more raster bands - it is referred to as either single band or multi band raster.
+One band represents a matrix of values. Usual color image (e.g. aerial photo) is a raster consisting of red, blue and green band.
+Single band layers typically represent either continuous variables (e.g. elevation) or discrete variables (e.g. land use).
+In some cases, a raster layer comes with a palette and raster values refer to colors stored in the palette.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">width</span><span class="p">(),</span> <span class="n">rlayer</span><span class="o">.</span><span class="n">height</span><span class="p">()</span>
+<span class="go">(812, 301)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">extent</span><span class="p">()</span><span class="o">.</span><span class="n">toString</span><span class="p">()</span>
+<span class="go">PyQt4.QtCore.QString(u&#39;12.095833,48.552777 : 18.863888,51.056944&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">rasterType</span><span class="p">()</span>
+<span class="go">2  # 0 = GrayOrUndefined (single band), 1 = Palette (single band), 2 = Multiband</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">bandCount</span><span class="p">()</span>
+<span class="go">3</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">metadata</span><span class="p">()</span>
+<span class="go">PyQt4.QtCore.QString(u&#39;&lt;p class=&quot;glossy&quot;&gt;Driver:&lt;/p&gt;...&#39;)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">hasPyramids</span><span class="p">()</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="drawing-style">
+<h2>Drawing Style<a class="headerlink" href="#drawing-style" title="Permalink to this headline">¶</a></h2>
+<p>When a raster layer is loaded, it gets a default drawing style based on its type. It can be altered either in raster layer properties or programmatically.
+The following drawing styles exist:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="5%" />
+<col width="23%" />
+<col width="72%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">Index</th>
+<th class="head">Constant: QgsRasterLater.X</th>
+<th class="head">Comment</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>1</td>
+<td>SingleBandGray</td>
+<td>Single band image drawn as a range of gray colors</td>
+</tr>
+<tr><td>2</td>
+<td>SingleBandPseudoColor</td>
+<td>Single band image drawn using a pseudocolor algorithm</td>
+</tr>
+<tr><td>3</td>
+<td>PalettedColor</td>
+<td>&#8220;Palette&#8221; image drawn using color table</td>
+</tr>
+<tr><td>4</td>
+<td>PalettedSingleBandGray</td>
+<td>&#8220;Palette&#8221; layer drawn in gray scale</td>
+</tr>
+<tr><td>5</td>
+<td>PalettedSingleBandPseudoColor</td>
+<td>&#8220;Palette&#8221; layerdrawn using a pseudocolor algorithm</td>
+</tr>
+<tr><td>7</td>
+<td>MultiBandSingleBandGray</td>
+<td>Layer containing 2 or more bands, but a single band drawn as a range of gray colors</td>
+</tr>
+<tr><td>8</td>
+<td>MultiBandSingleBandPseudoColor</td>
+<td>Layer containing 2 or more bands, but a single band drawn using a pseudocolor algorithm</td>
+</tr>
+<tr><td>9</td>
+<td>MultiBandColor</td>
+<td>Layer containing 2 or more bands, mapped to RGB color space.</td>
+</tr>
+</tbody>
+</table>
+<p>To query the current drawing style:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">drawingStyle</span><span class="p">()</span>
+<span class="go">9</span>
+</pre></div>
+</div>
+<p>Single band raster layers can be drawn either in gray colors (low values = black, high values = white) or with a pseudocolor algorithm
+that assigns colors for values from the single band. Single band rasters with a palette can be additionally drawn using their palette.
+Multiband layers are typically drawn by mapping the bands to RGB colors. Other possibility is to use just one band for gray or pseudocolor
+drawing.</p>
+<p>The following sections explain how to query and modify the layer drawing style. After doing the changes, you might want to force update
+of map canvas, see <a class="reference internal" href="#refresh-layer"><em>Refresing Layers</em></a>.</p>
+<p><strong>TODO:</strong> contrast enhancements, transparency (no data), user defined min/max, band statistics</p>
+</div>
+<div class="section" id="single-band-rasters">
+<h2>Single Band Rasters<a class="headerlink" href="#single-band-rasters" title="Permalink to this headline">¶</a></h2>
+<p>They are rendered in gray colors by default. To change the drawing style to pseudocolor:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setDrawingStyle</span><span class="p">(</span><span class="n">QgsRasterLayer</span><span class="o">.</span><span class="n">SingleBandPseudoColor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setColorShadingAlgorithm</span><span class="p">(</span><span class="n">QgsRasterLayer</span><span class="o">.</span><span class="n">PseudoColorShader</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <tt class="docutils literal"><span class="pre">PseudoColorShader</span></tt> is a basic shader that highlighs low values in blue and high values in red. Another, <tt class="docutils literal"><span class="pre">FreakOutShader</span></tt> uses
+more fancy colors and according to the documentation, it will frighten your granny and make your dogs howl.</p>
+<p>There is also <tt class="docutils literal"><span class="pre">ColorRampShader</span></tt> which maps the colors as specified by its color map. It has three modes of interpolation of values:</p>
+<ul class="simple">
+<li>linear (<tt class="docutils literal"><span class="pre">INTERPOLATED</span></tt>): resulting color is linearly interpolated from the color map entries above and below the actual pixel value</li>
+<li>discrete (<tt class="docutils literal"><span class="pre">DISCRETE</span></tt>): color is used from the color map entry with equal or higher value</li>
+<li>exact (<tt class="docutils literal"><span class="pre">EXACT</span></tt>): color is not interpolated, only the pixels with value equal to color map entries are drawn</li>
+</ul>
+<p>To set an interpolated color ramp shader ranging from green to yellow color (for pixel values from 0 to 255):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setColorShadingAlgorithm</span><span class="p">(</span><span class="n">QgsRasterLayer</span><span class="o">.</span><span class="n">ColorRampShader</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">lst</span> <span class="o">=</span> <span class="p">[</span> <span class="n">QgsColorRampShader</span><span class="o">.</span><span class="n">ColorRampItem</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">)),</span> <span class="n">QgsColorRampShader</span><span class="o">.</span><span class="n">ColorRampItem</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="n">QColor</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">))</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fcn</span> <span class="o">=</span> <span class="n">rlayer</span><span class="o">.</span><span class="n">rasterShader</span><span class="p">()</span><span class="o">.</span><span class="n">rasterShaderFunction</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fcn</span><span class="o">.</span><span class="n">setColorRampType</span><span class="p">(</span><span class="n">QgsColorRampShader</span><span class="o">.</span><span class="n">INTERPOLATED</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">fcn</span><span class="o">.</span><span class="n">setColorRampItemList</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>To return back to default gray levels, use:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setDrawingStyle</span><span class="p">(</span><span class="n">QgsRasterLayer</span><span class="o">.</span><span class="n">SingleBandGray</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="multi-band-rasters">
+<h2>Multi Band Rasters<a class="headerlink" href="#multi-band-rasters" title="Permalink to this headline">¶</a></h2>
+<p>By default, QGIS maps the first three bands to red, green and blue values to create a color image (this is the <tt class="docutils literal"><span class="pre">MultiBandColor</span></tt> drawing style.
+In some cases you might want to override these setting. The following code interchanges red band (1) and green band (2):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setGreenBandName</span><span class="p">(</span><span class="n">rlayer</span><span class="o">.</span><span class="n">bandName</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setRedBandName</span><span class="p">(</span><span class="n">rlayer</span><span class="o">.</span><span class="n">bandName</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>In case only one band is necessary for visualization of the raster, single band drawing can be chosen - either gray levels or pseudocolor,
+see previous section:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setDrawingStyle</span><span class="p">(</span><span class="n">QgsRasterLayer</span><span class="o">.</span><span class="n">MultiBandSingleBandPseudoColor</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setGrayBandName</span><span class="p">(</span><span class="n">rlayer</span><span class="o">.</span><span class="n">bandName</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">rlayer</span><span class="o">.</span><span class="n">setColorShadingAlgorithm</span><span class="p">(</span><span class="n">QgsRasterLayer</span><span class="o">.</span><span class="n">PseudoColorShader</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c"># now set the shader</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="refresing-layers">
+<span id="refresh-layer"></span><h2>Refresing Layers<a class="headerlink" href="#refresing-layers" title="Permalink to this headline">¶</a></h2>
+<p>If you do change layer symbology and would like ensure that the changes are immediately visible to the user, call these methods:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">layer</span><span class="p">,</span> <span class="s">&quot;setCacheImage&quot;</span><span class="p">):</span> <span class="n">layer</span><span class="o">.</span><span class="n">setCacheImage</span><span class="p">(</span><span class="bp">None</span><span class="p">)</span>
+<span class="n">layer</span><span class="o">.</span><span class="n">triggerRepaint</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The first call will ensure that the cached image of rendered layer is erased in case render caching is turned on. This functionality is available from QGIS 1.4,
+in previous versions this function does not exist - to make sure that the code works with all versions of QGIS, we first check whether the method exists.</p>
+<p>The second call emits signal that will force any map canvas containing the layer to issue a refresh.</p>
+<p>In case you have changed layer symbology (see sections about raster and vector layers on how to do that), you might want to force QGIS to update the layer
+symbology in the layer list (legend) widget. This can be done as follows (<tt class="docutils literal"><span class="pre">iface</span></tt> is an instance of QgisInterface):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">iface</span><span class="o">.</span><span class="n">legendInterface</span><span class="p">()</span><span class="o">.</span><span class="n">refreshLayerSymbology</span><span class="p">(</span><span class="n">layer</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="query-values">
+<h2>Query Values<a class="headerlink" href="#query-values" title="Permalink to this headline">¶</a></h2>
+<p>To do a query on value of bands of raster layer at some specified point:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">ident</span> <span class="o">=</span> <span class="n">rlayer</span><span class="o">.</span><span class="n">identify</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mf">15.30</span><span class="p">,</span><span class="mf">40.98</span><span class="p">))</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span><span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">ident</span><span class="o">.</span><span class="n">iteritems</span><span class="p">():</span>
+  <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">),</span><span class="s">&quot;:&quot;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The identify function returns a dictionary - keys are band names, values are the values at chosen point.
+Both key and value are QString instances so to see actual value you&#8217;ll need to convert them to python strings (as shown in code snippet).</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Using Raster Layers</a><ul>
+<li><a class="reference external" href="#layer-details">Layer Details</a></li>
+<li><a class="reference external" href="#drawing-style">Drawing Style</a></li>
+<li><a class="reference external" href="#single-band-rasters">Single Band Rasters</a></li>
+<li><a class="reference external" href="#multi-band-rasters">Multi Band Rasters</a></li>
+<li><a class="reference external" href="#refresing-layers">Refresing Layers</a></li>
+<li><a class="reference external" href="#query-values">Query Values</a></li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="loadlayer.html"
+                                  title="previous chapter">Loading Layers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="vector.html"
+                                  title="next chapter">Using Vector Layers</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/raster.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="vector.html" title="Using Vector Layers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="loadlayer.html" title="Loading Layers"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

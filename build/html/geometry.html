@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Geometry Handling &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Projections Support" href="crs.html" />
+    <link rel="prev" title="Using Vector Layers" href="vector.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="crs.html" title="Projections Support"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="vector.html" title="Using Vector Layers"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="geometry-handling">
+<span id="geometry"></span><h1>Geometry Handling<a class="headerlink" href="#geometry-handling" title="Permalink to this headline">¶</a></h1>
+<p>Points, linestrings, polygons (and more complex shapes) are commonly referred to as geometries. They are represented using <tt class="xref docutils literal"><span class="pre">QgsGeometry</span></tt> class.</p>
+<p>To extract information from geometry there are accessor functions for every vector type. How do accessors work:</p>
+<dl class="docutils">
+<dt><tt class="xref docutils literal"><span class="pre">asPoint()</span></tt></dt>
+<dd>returns <tt class="xref docutils literal"><span class="pre">QgsPoint</span></tt></dd>
+<dt><tt class="xref docutils literal"><span class="pre">asPolyline()</span></tt></dt>
+<dd>returns a list of <tt class="xref docutils literal"><span class="pre">QgsPoint</span></tt> items</dd>
+<dt><tt class="xref docutils literal"><span class="pre">asPolygon()</span></tt></dt>
+<dd>returns a list of rings, every ring consists of a list of <tt class="xref docutils literal"><span class="pre">QgsPoint</span></tt> items. First ring is outer, subsequent rings are holes.</dd>
+</dl>
+<p>You can use <tt class="xref docutils literal"><span class="pre">QgsGeometry.isMultipart()</span></tt> to find out whether the feature is multipart. For multipart features there are similar accessor functions:
+<tt class="xref docutils literal"><span class="pre">asMultiPoint()</span></tt>, <tt class="xref docutils literal"><span class="pre">asMultiPolyline()</span></tt>, <tt class="xref docutils literal"><span class="pre">asMultiPolygon()</span></tt>.</p>
+<p>There are several options how to create a geometry:</p>
+<ul>
+<li><p class="first">from coordinates:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">gPnt</span> <span class="o">=</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPoint</span><span class="p">(</span><span class="n">QgsPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="n">gLine</span> <span class="o">=</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPolyline</span><span class="p">(</span> <span class="p">[</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span> <span class="p">]</span> <span class="p">)</span>
+<span class="n">gPolygon</span> <span class="o">=</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromPolygon</span><span class="p">(</span> <span class="p">[</span> <span class="p">[</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">2</span><span class="p">),</span> <span class="n">QgsPoint</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">]</span> <span class="p">]</span> <span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">from well-known text (WKT):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">gem</span> <span class="o">=</span> <span class="n">QgsGeometry</span><span class="o">.</span><span class="n">fromWkt</span><span class="p">(</span><span class="s">&quot;POINT (3 4)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+<li><p class="first">from well-known binary (WKB):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">g</span> <span class="o">=</span> <span class="n">QgsGeometry</span><span class="p">()</span>
+<span class="n">g</span><span class="o">.</span><span class="n">setWkbAndOwnership</span><span class="p">(</span><span class="n">wkb</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">wkb</span><span class="p">))</span>
+</pre></div>
+</div>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="vector.html"
+                                  title="previous chapter">Using Vector Layers</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="crs.html"
+                                  title="next chapter">Projections Support</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/geometry.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="crs.html" title="Projections Support"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="vector.html" title="Using Vector Layers"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,227 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; PyQGIS v1.4 documentation</title>
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '#',
+        VERSION:     '1.4',
+        COLLAPSE_MODINDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="PyQGIS v1.4 documentation" href="index.html" />
+    <link rel="next" title="Loading Layers" href="loadlayer.html" />
+    <link rel="prev" title="PyQGIS Developer Cookbook" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="loadlayer.html" title="Loading Layers"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PyQGIS Developer Cookbook"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="introduction">
+<span id="id1"></span><h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<p>This document is intended to work both as a tutorial and a reference guide. While it does not list all possible use cases, it should give
+a good overview of the principal functionality.</p>
+<p>Starting from 0.9 release, QGIS has optional scripting support using Python language. We&#8217;ve decided for Python as it&#8217;s one of the most favourite
+languages for scripting. PyQGIS bindings depend on SIP and PyQt4. The reason for using SIP instead of more widely used SWIG is that the whole
+QGIS code depends on Qt libraries. Python bindings for Qt (PyQt) are done also using SIP and this allows seamless integration of PyQGIS with PyQt.</p>
+<dl class="docutils">
+<dt><strong>TODO:</strong></dt>
+<dd>Getting PyQGIS to work (Manual compilation, Troubleshooting)</dd>
+</dl>
+<p>There are several ways how to use QGIS python bindings, they are covered in detail in the following sections:</p>
+<ul class="simple">
+<li>issue commands in Python console within QGIS</li>
+<li>create and use plugins in Python</li>
+<li>create custom applications based on QGIS API</li>
+</ul>
+<p>There is a <a class="reference external" href="http://doc.qgis.org/">complete QGIS API</a> reference that documents the classes from the QGIS libraries.
+Pythonic QGIS API is nearly identical to the API in C++.</p>
+<p>There are some resources about programming with PyQGIS on <a class="reference external" href="http://blog.qgis.org/">QGIS blog</a>.
+See <a class="reference external" href="http://blog.qgis.org/?q=node/59">QGIS tutorial ported to Python</a> for some examples of simple 3rd party apps.
+A good resource when dealing with plugins is to download some plugins from <a class="reference external" href="http://pyqgis.org/">plugin repository</a> and examine their code.</p>
+<div class="section" id="python-console">
+<h2>Python Console<a class="headerlink" href="#python-console" title="Permalink to this headline">¶</a></h2>
+<p>For scripting, it is possible to take advantage of integrated Python console. It can be opened from menu: <em>Plugins ‣ Python Console</em>.
+The console opens as a non-modal utility window:</p>
+<img alt="_images/console.png" src="_images/console.png" />
+<p>The screenshot above illustrates how to get the layer currntly selected in the layer list, show its ID and optionally, if it is a vector layer, show the feature count.
+For interaction with QGIS environment, there is <tt class="xref docutils literal"><span class="pre">qgis.utils.iface</span></tt> variable, which is instance of <tt class="xref docutils literal"><span class="pre">QgisInterface</span></tt>. This interface allows access to the map
+canvas, menus, toolbars and other parts of the QGIS application.</p>
+<p>For convenience of the user, the following statements are executed when the console is started (in future it will be possible to set further initial commands):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">qgis.utils</span>
+</pre></div>
+</div>
+<p>For those which use the console often, it may be useful to set a shortcut for triggering the console (within menu <em>Settings ‣ Configure shortcuts...</em>)</p>
+</div>
+<div class="section" id="python-plugins">
+<h2>Python Plugins<a class="headerlink" href="#python-plugins" title="Permalink to this headline">¶</a></h2>
+<p>Quantum GIS allows enhancement of its functionality using plugins. This was originally possible only with C++ language. With the addition of Python support to QGIS,
+it is also possible to use plugins written in Python. Great advantages over C++ plugins is the simplicity of distribution (no compiling for each platform needed)
+and easier development.</p>
+<p>Many plugins covering various functionality have been written since the introduction of Python support. Plugin installer allows users to easily fetch, upgrade and
+remove Python plugins. See <a class="reference external" href="http://www.qgis.org/wiki/Python_Plugin_Repositories">Python Plugin Repositories</a> page for various sources of plugins.</p>
+<p>Creating plugins in Python is simple, see <a class="reference external" href="plugins.html#plugins"><em>Developing Python Plugins</em></a> for detailed instructions.</p>
+</div>
+<div class="section" id="python-applications">
+<h2>Python Applications<a class="headerlink" href="#python-applications" title="Permalink to this headline">¶</a></h2>
+<p>Often when processing some GIS data, it is handy to create some scripts for automating the process instead of doing the same task again and again.
+With PyQGIS, this is perfectly possible &#8212; import the <tt class="xref docutils literal"><span class="pre">qgis.core</span></tt> module, initialize it and you are ready for the processing.</p>
+<p>Or you may want to create an interactive application that uses some GIS functionality &#8212; measure some data, export a map in PDF or any other functionality.
+The <tt class="xref docutils literal"><span class="pre">qgis.gui</span></tt> module additionally brings various GUI components, most notably the map canvas widget that can be very easily incorporated into the
+application with support for zooming, panning and/or any further custom map tools.</p>
+<div class="section" id="using-pyqgis-in-custom-application">
+<h3>Using PyQGIS in custom application<a class="headerlink" href="#using-pyqgis-in-custom-application" title="Permalink to this headline">¶</a></h3>
+<p>Note: do <em>not</em> use <tt class="docutils literal"><span class="pre">qgis.py</span></tt> as a name for your test script &#8212; python will not be able to import the bindings as the script&#8217;s name will shadow them.</p>
+<p>First of all you have to import qgis module, set QGIS path where to search for resources - database of projections, providers etc.
+When you set prefix path with second argument set as <tt class="xref xref docutils literal"><span class="pre">True</span></tt>, QGIS will initialize all paths with standard dir under the prefix directory.
+Calling <tt class="xref docutils literal"><span class="pre">initQgis()</span></tt> function is important to let QGIS search for the available providers.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">qgis.core</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># supply path to where is your qgis installed</span>
+<span class="n">QgsApplication</span><span class="o">.</span><span class="n">setPrefixPath</span><span class="p">(</span><span class="s">&quot;/path/to/qgis/installation&quot;</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
+
+<span class="c"># load providers</span>
+<span class="n">QgsApplication</span><span class="o">.</span><span class="n">initQgis</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now you can work with QGIS API - load layers and do some processing or fire up a GUI with a map canvas. The possibilities are endless :-)</p>
+<p>When you are done with using QGIS library, call <tt class="xref docutils literal"><span class="pre">exitQgis()</span></tt> to make sure that everything is cleaned up (e.g. clear map layer registry and delete layers):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">QgsApplication</span><span class="o">.</span><span class="n">exitQgis</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="running-custom-applications">
+<h3>Running Custom Applications<a class="headerlink" href="#running-custom-applications" title="Permalink to this headline">¶</a></h3>
+<p>You will need to tell your system where to search for QGIS libraries and appropriate Python modules if they are not in a well-known location &#8212; otherwise Python
+will complain:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">qgis.core</span>
+<span class="go">ImportError: No module named qgis.core</span>
+</pre></div>
+</div>
+<p>This can be fixed by setting the <tt class="docutils literal"><span class="pre">PYTHONPATH</span></tt> environment variable. In the following commands, <tt class="docutils literal"><span class="pre">qgispath</span></tt> should be replaced with your actual QGIS installation path:</p>
+<ul class="simple">
+<li>on Linux: <strong>export PYTHONPATH=/qgispath/share/qgis/python</strong></li>
+<li>on Windows: <strong>set PYTHONPATH=c:\qgispath\python</strong></li>
+</ul>
+<p>The path to the PyQGIS modules is now known, however they depend on <tt class="docutils literal"><span class="pre">qgis_core</span></tt> and <tt class="docutils literal"><span class="pre">qgis_gui</span></tt> libraries (the Python modules serve only as wrappers). Path to these
+libraries is typically unknown for the operating system, so you get an import error again (the message might vary depending on the system):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">qgis.core</span>
+<span class="go">ImportError: libqgis_core.so.1.5.0: cannot open shared object file: No such file or directory</span>
+</pre></div>
+</div>
+<p>Fix this by adding the directories where the QGIS libraries reside to search path of the dynamic linker:</p>
+<ul class="simple">
+<li>on Linux: <strong>export LD_LIBRARY_PATH=/qgispath/lib</strong></li>
+<li>on Windows: <strong>set PATH=C:\qgispath;%PATH%</strong></li>
+</ul>
+<p>These commands can be put into a bootstrap script that will take care of the startup.
+When deploying custom applications using PyQGIS, there are usually two possibilities:</p>
+<ul class="simple">
+<li>require user to install QGIS on his platform prior to installing your application. The application installer should look for default locations of QGIS libraries
+and allow user to set the path if not found. This approach has the advantage of being simpler, however it requires user to do more steps.</li>
+<li>package QGIS together with your application. Releasing the application may be more challenging and the package will be larger, but the user will be saved from the
+burden of downloading and installing additional pieces of software.</li>
+</ul>
+<p>The two deployment models can be mixed - deploy standalone application on Windows and Mac OS X, for Linux leave the installation of QGIS up to user and his package manager.</p>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+            <h3><a href="index.html">Table Of Contents</a></h3>
+            <ul>
+<li><a class="reference external" href="#">Introduction</a><ul>
+<li><a class="reference external" href="#python-console">Python Console</a></li>
+<li><a class="reference external" href="#python-plugins">Python Plugins</a></li>
+<li><a class="reference external" href="#python-applications">Python Applications</a><ul>
+<li><a class="reference external" href="#using-pyqgis-in-custom-application">Using PyQGIS in custom application</a></li>
+<li><a class="reference external" href="#running-custom-applications">Running Custom Applications</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            <h4>Previous topic</h4>
+            <p class="topless"><a href="index.html"
+                                  title="previous chapter">PyQGIS Developer Cookbook</a></p>
+            <h4>Next topic</h4>
+            <p class="topless"><a href="loadlayer.html"
+                                  title="next chapter">Loading Layers</a></p>
+            <h3>This Page</h3>
+            <ul class="this-page-menu">
+              <li><a href="_sources/intro.txt"
+                     rel="nofollow">Show Source</a></li>
+            </ul>
+          <div id="searchbox" style="display: none">
+            <h3>Quick search</h3>
+              <form class="search" action="search.html" method="get">
+                <input type="text" name="q" size="18" />
+                <input type="submit" value="Go" />
+                <input type="hidden" name="check_keywords" value="yes" />
+                <input type="hidden" name="area" value="default" />
+              </form>
+              <p class="searchtip" style="font-size: 90%">
+              Enter search terms or a module, class or function name.
+              </p>
+          </div>
+          <script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="loadlayer.html" title="Loading Layers"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="PyQGIS Developer Cookbook"
+             >previous</a> |</li>
+        <li><a href="index.html">PyQGIS v1.4 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+      &copy; Copyright 2010, Martin Dobias.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 0.6.4.
+    </div>
+  </body>
+</html>
